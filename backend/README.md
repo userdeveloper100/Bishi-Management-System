@@ -2,23 +2,52 @@
 
 REST API for the Bishi (chit fund) management system. The backend is built with Node.js, Express, TypeScript, Prisma, and PostgreSQL.
 
-## Current progress
+## Scope
 
-Implemented:
+The backend covers the data model, authentication, and CRUD APIs that the frontend needs to manage groups, bishis, memberships, transactions, messages, and notifications, with an audit trail.
+
+Out of scope for now (see [Not implemented yet](#not-implemented-yet)): payment processing, bishi draw and winner selection, and multi-language support.
+
+## Status
+
+### Done
 
 - Prisma data models for users, roles, permissions, groups, Bishis, transactions, memberships, messages, notifications, and audit logs.
 - CRUD API routes for users, groups, Bishis, transactions, memberships, messages, notifications, and audit logs.
 - User registration and login with bcrypt password hashing and JWT tokens.
-- Authentication middleware and role checks on user-management routes.
-- A seed script that creates `admin` and `user` roles and their initial permissions.
-- Swagger UI and a root health-check endpoint.
+- Authentication middleware and role checks: `admin` role required for user-management routes and for deletes on other resources.
+- Seed script that creates the `admin` and `user` roles and their initial permissions.
 - Membership creation with `userId` and `groupId` validation.
-- End-to-end test suite in `tests/e2e/` (`npm run test:e2e`) covering all 42 API endpoints, including auth, role checks, validation, and unknown-ID handling.
 - Token authentication on every resource route, with consistent `{ success, message }` error responses.
 - Input validation on create and update, with whitelisted update fields.
 - Hashed passwords for users created or updated through the API, and password hashes removed from user responses.
+- Swagger UI at `/api-docs` and a root health-check endpoint.
+- End-to-end API test suite in `tests/e2e/` (`npm run test:e2e`) covering all 42 API endpoints, including auth, role checks, validation, and unknown-ID handling.
 
-Not implemented yet:
+### In progress
+
+- Nothing is in progress on the backend at the moment.
+
+### Pending
+
+- Automatic audit logging of changes to entities other than the audit log itself.
+- Field-level validation tests for each resource, beyond the empty-body and missing-field cases.
+- Payment integration.
+- Bishi draw and winner-selection workflows.
+- Multi-language support.
+
+## Plan
+
+There is no separate PRD or epic list in this repository yet. The phases below are derived from the features implemented so far and the pending items above, so treat the order as a proposal.
+
+| Phase | Goal | Status |
+| --- | --- | --- |
+| 1. Foundation | Data models, auth, CRUD APIs, validation, seed data, API tests | Done |
+| 2. Hardening | Audit logging for all entities, field-level validation tests | Pending |
+| 3. Business workflows | Bishi draw and winner selection, payment integration | Pending |
+| 4. Localization and release | Multi-language support, deployment configuration | Pending |
+
+## Not implemented yet
 
 - Multi-language support.
 - Payment integration.
@@ -51,6 +80,8 @@ backend/
 │   ├── app.ts              # Express app, middleware, and routes
 │   ├── prismaClient.ts     # Prisma client
 │   └── server.ts           # Server startup
+├── tests/
+│   └── e2e/                # End-to-end API tests
 ├── package.json
 └── README.md
 ```
@@ -70,7 +101,7 @@ npm install
 
 ### 2. Configure environment variables
 
-Create a `.env` file in the repository root:
+Create a `.env` file in the `backend/` folder:
 
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/bishi_db?schema=public"
@@ -80,7 +111,7 @@ JWT_EXPIRES_IN=1d
 BCRYPT_SALT_ROUNDS=10
 ```
 
-`DATABASE_URL` must point to your PostgreSQL database. `PORT` defaults to `5000`, `JWT_EXPIRES_IN` defaults to `1d`, and `BCRYPT_SALT_ROUNDS` defaults to `10`.
+`DATABASE_URL` must point to your PostgreSQL database. `PORT` defaults to `5000`, `JWT_EXPIRES_IN` defaults to `1d`, and `BCRYPT_SALT_ROUNDS` defaults to `10`. Do not commit `.env`; it is git-ignored.
 
 ### 3. Generate Prisma Client and apply migrations
 
@@ -167,6 +198,6 @@ The suite starts the backend on port `5055` (set `TEST_PORT` to change it) and r
 
 ## Author
 
-**Shailendra Pardeshi**  
-Senior Full Stack Developer  
+**Shailendra Pardeshi**
+Senior Full Stack Developer
 [LinkedIn](https://www.linkedin.com/in/shailendra-pardeshi-031596192) · shailendrapardeshi123@gmail.com
