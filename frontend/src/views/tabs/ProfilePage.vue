@@ -45,7 +45,7 @@
         :open="proOpen"
         :title="$t('pro.title')"
         :subtitle="$t('pro.subtitle')"
-        icon="crown-outline"
+        icon="diamond-outline"
         :close-label="$t('common.maybeLater')"
         @close="proOpen = false"
       >

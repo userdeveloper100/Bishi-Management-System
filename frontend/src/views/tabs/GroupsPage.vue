@@ -63,7 +63,7 @@
           <GroupCard v-for="group in groups.groups" :key="group.id" :group="group" @add-members="onAddMembers" />
         </div>
 
-        <div class="mt-8 d-flex gap-3 px-1">
+        <div class="mt-8 d-flex items-start gap-3 px-1">
           <ion-icon
             name="shield-checkmark-outline"
             class="mt-0-5 shrink-0 fs-20 text-champagne-dark"

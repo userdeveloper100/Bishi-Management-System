@@ -73,9 +73,14 @@ $mint: map.get(t.$colors, 'mint');
 }
 
 // Small text button in gold, for links such as "Change number".
+// Text-style action: no button box, background, or underline.
 .bh-link {
+  padding: 0;
+  border: 0;
+  background: none;
   color: map.get(t.$colors, 'champagne-dark');
   font-weight: 500;
+  cursor: pointer;
   transition: color 0.2s ease;
 
   &:disabled {

@@ -8,7 +8,7 @@
       class="d-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-champagne-50 bg-champagne-10 text-champagne-light"
       aria-hidden="true"
     >
-      <ion-icon name="crown-outline" class="fs-22" />
+      <ion-icon name="diamond-outline" class="fs-22 text-champagne-light" aria-hidden="true" />
     </div>
     <div class="min-w-0 flex-1">
       <p class="fs-16 fw-semibold text-champagne-light">{{ $t('pro.title') }}</p>

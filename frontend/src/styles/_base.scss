@@ -20,3 +20,25 @@ input {
   font: inherit;
   color: inherit;
 }
+
+// Lists are styled by their components, so the browser's bullets and indents are removed.
+ul,
+ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// Buttons are plain by default. Components that need a box (bh-btn, bh-pill, ...) set their own background.
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+// Links take the surrounding text style. Underlines and browser link colours are removed.
+a {
+  color: inherit;
+  text-decoration: none;
+}

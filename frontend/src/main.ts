@@ -3,8 +3,11 @@ import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 
 import App from './App.vue';
+import { registerIcons } from './icons';
 import { i18n } from './i18n';
 import router from './router';
+
+registerIcons();
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
