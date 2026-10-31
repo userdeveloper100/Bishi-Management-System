@@ -72,11 +72,11 @@ There are three tiers. The role lives on the user (`Role` table) and is carried 
 
 | Tier | Role | What it can do |
 | --- | --- | --- |
-| Super Admin | `super_admin` | Platform owner. Sees every group, can manage dues for any group, and has the admin-only user routes. Seeded locally as `superadmin@admin.com` / `superadmin@123`, phone `+91 1234567892`. |
+| Super Admin | `super_admin` | Platform owner. Sees every group, can manage dues for any group, and is the only role that can use the master user routes (`/api/users`). Seeded locally as `superadmin@admin.com` / `superadmin@123`, phone `+91 1234567892`. |
 | Admin (group organizer) | Member of a group with `Membership.role = "admin"` | Creates the group's dues, lists them, and marks payments as paid. Sees the groups they belong to. |
 | Member | `user` | Sees only the groups they belong to, and their own dues. Cannot create dues or mark payments. |
 
-The existing platform `admin` role keeps its previous access to user routes and the full group list. It is a legacy role. Move those checks to `super_admin` when you are ready.
+The platform `admin` role no longer reaches the user routes (`/api/users`); those return 403. It keeps its access to the full group list and to deletes, as a legacy role. Move those checks to `super_admin` when you are ready.
 
 ## Dues and manual payments
 

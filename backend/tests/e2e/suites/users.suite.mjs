@@ -9,10 +9,9 @@ export function usersSuite(ctx) {
       assert.equal(res.status, 401);
     });
 
-    it("lets an authenticated user list users", async () => {
+    it("forbids a plain user from listing users with 403", async () => {
       const res = await api("GET", "/api/users", { token: ctx.user.token });
-      assert.equal(res.status, 200);
-      assert.ok(Array.isArray(res.body));
+      assert.equal(res.status, 403);
     });
 
     it("forbids non-admins from fetching a user by id with 403", async () => {

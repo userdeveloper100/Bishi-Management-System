@@ -50,7 +50,7 @@ The frontend is in [../frontend](../frontend/README.md). The monorepo overview i
 
 | Role | Stored as | Access |
 | --- | --- | --- |
-| Super Admin | `super_admin` | Sees every group. Has the admin-only user routes. Can manage dues for any group. Seeded locally as `superadmin@admin.com`. |
+| Super Admin | `super_admin` | Sees every group. The only role that can use the `/api/users` routes. Can manage dues for any group. Seeded locally as `superadmin@admin.com`. |
 | Admin (group organizer) | Membership with `role = "admin"` on the group | Creates dues and marks them paid for their own groups. Sees their groups in the list. |
 | Admin (legacy platform role) | `admin` | Keeps its previous access to user routes, deletes, and the full group list. Planned to move to `super_admin`. |
 | Member | `user` | Sees the groups they belong to and their own dues. Cannot mark payments or manage dues. |
@@ -82,7 +82,7 @@ backend/
 ├── src/
 │   ├── config/swagger.ts    # OpenAPI setup, including the bearer JWT scheme
 │   ├── controllers/         # HTTP handlers (thin: read the request, call a service, send the response)
-│   ├── middlewares/         # authMiddleware (token), authorizeRoles (role), errorHandler
+│   ├── middlewares/         # authMiddleware (token), authorizeRoles (role), requireSuperAdmin (DB role check), errorHandler
 │   ├── routes/              # Route definitions with Swagger comments
 │   ├── services/            # Business rules and database access
 │   ├── utils/               # OTP and phone helpers, role constants, HTTP errors, validation
@@ -214,7 +214,7 @@ All routes use the `/api` prefix. Errors return `{ "success": false, "message": 
 | Area | Route | Access | Operations |
 | --- | --- | --- | --- |
 | Auth | `/api/auth` | Public | `POST /send-otp`, `POST /verify-otp`, `POST /login`, `POST /register` |
-| Users | `/api/users` | Token; admin or Super Admin for create, update, and delete | `GET /`, `GET /:id`, `POST /`, `PUT /:id`, `DELETE /:id` |
+| Users | `/api/users` | Super Admin only (`requireSuperAdmin`, role read from the database). Other roles get 403. | `GET /`, `GET /:id`, `POST /`, `PUT /:id`, `DELETE /:id` |
 | Groups | `/api/groups` | Token; deletes need admin | CRUD. `GET /` returns the caller's groups, or every group for admin and Super Admin, with the savings summary. |
 | Bishis | `/api/bishis` | Token; deletes need admin | CRUD |
 | Transactions | `/api/transactions` | Token; deletes need admin | CRUD |
@@ -280,7 +280,7 @@ The suite under `tests/e2e/` starts the backend on port `5055` (set `TEST_PORT` 
 
 - OTPs are not delivered to phones. Only the console sender exists.
 - The local test login is a development tool. Its code is public, so keep it disabled on any shared server.
-- The legacy `admin` role still has platform-wide access. See [Roles](#roles).
+- The legacy `admin` role still has platform-wide access to groups and deletes, but not to the `/api/users` routes. See [Roles](#roles).
 - Some seeded passwords are fixed defaults for local use.
 
 ## Author

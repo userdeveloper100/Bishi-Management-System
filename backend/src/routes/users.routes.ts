@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { userController } from "../controllers/users.controller";
-import { authMiddleware, authorizeRoles } from "../middlewares/auth";
+import { authMiddleware } from "../middlewares/auth";
+import { requireSuperAdmin } from "../middlewares/superAdmin";
 
+// Every route here is master data (all users), so each one needs a Super Admin.
 const router = Router();
 
 /**
@@ -76,7 +78,7 @@ const router = Router();
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get("/", authMiddleware, userController.getAll);
+router.get("/", authMiddleware, requireSuperAdmin, userController.getAll);
 
 /**
  * @swagger
@@ -105,7 +107,7 @@ router.get("/", authMiddleware, userController.getAll);
 router.get(
   "/:id",
   authMiddleware,
-  authorizeRoles("admin", "super_admin"),
+  requireSuperAdmin,
   userController.getById,
 );
 
@@ -134,7 +136,7 @@ router.get(
 router.post(
   "/",
   authMiddleware,
-  authorizeRoles("admin", "super_admin"),
+  requireSuperAdmin,
   userController.create,
 );
 
@@ -166,7 +168,7 @@ router.post(
 router.put(
   "/:id",
   authMiddleware,
-  authorizeRoles("admin", "super_admin"),
+  requireSuperAdmin,
   userController.update,
 );
 
@@ -192,7 +194,7 @@ router.put(
 router.delete(
   "/:id",
   authMiddleware,
-  authorizeRoles("admin", "super_admin"),
+  requireSuperAdmin,
   userController.remove,
 );
 
