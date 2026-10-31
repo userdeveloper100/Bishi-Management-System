@@ -3,14 +3,13 @@ import { prisma } from "../prismaClient";
 import { getSmsSender } from "./sms.service";
 import { HttpError, badRequest } from "../utils/httpError";
 import { normalizePhone } from "../utils/phone";
+import { NO_ACCOUNT_MESSAGE } from "./auth.service";
 import {
   LOCAL_TEST_OTP,
-  LOCAL_TEST_PHONES,
   OTP_LENGTH,
   generateOtp,
   hashOtp,
   isLocalTestOtpEnabled,
-  isLocalTestPhone,
   otpMatches,
 } from "../utils/otp";
 
@@ -25,26 +24,23 @@ function hashSecret(): string {
   return secret;
 }
 
+/** Only numbers that belong to an account in the database may receive a code. */
+async function assertAccountExists(phone: string): Promise<void> {
+  const user = await prisma.user.findUnique({
+    where: { phone },
+    select: { id: true },
+  });
+  if (!user) throw new HttpError(404, NO_ACCOUNT_MESSAGE);
+}
+
 export const otpService = {
   /**
    * Create a new OTP for the phone number and send it by SMS.
-   * The plain code is never returned to the caller and never stored.
+   * The number must belong to an account. The plain code is never returned to the caller and never stored.
    */
   async sendOtp(phoneInput: unknown) {
     const phone = normalizePhone(phoneInput);
-
-    // Local dummy login: no SMS and no rate limits. Verify with LOCAL_TEST_OTP.
-    if (isLocalTestPhone(phone)) {
-      console.log(
-        `[otp] LOCAL DUMMY LOGIN: ${phone} uses code ${LOCAL_TEST_OTP}. No SMS sent.`,
-      );
-      return {
-        success: true,
-        message: "OTP sent",
-        expiresInSeconds: OTP_TTL_SECONDS,
-        resendInSeconds: RESEND_COOLDOWN_SECONDS,
-      };
-    }
+    await assertAccountExists(phone);
 
     const now = new Date();
 
@@ -112,13 +108,11 @@ export const otpService = {
     ) {
       throw badRequest(`otp must be a ${OTP_LENGTH}-digit code`);
     }
+    await assertAccountExists(phone);
 
-    // Local development only: the fixed test code works without a stored OTP.
+    // Local development only: the fixed test code works without a stored OTP, for any account in the database.
     if (otpInput === LOCAL_TEST_OTP && isLocalTestOtpEnabled()) {
-      const label = LOCAL_TEST_PHONES.includes(phone)
-        ? "LOCAL DUMMY LOGIN"
-        : "LOCAL TEST MODE";
-      console.log(`[otp] ${label}: accepted test code for ${phone}`);
+      console.log(`[otp] LOCAL TEST MODE: accepted test code for ${phone}`);
       return phone;
     }
 

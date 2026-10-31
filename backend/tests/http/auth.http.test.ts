@@ -15,14 +15,33 @@ jest.mock("../../src/services/sms.service", () => ({
 const app = require("../../src/app").default;
 
 const PHONE = "+919876543210";
+const MEMBER_PHONE = "+911234567891";
 const CODE = "482616";
 const sendMock = jest.fn();
+
+/** A user row as the phone lookup returns it, with its role and permissions. */
+function accountFor(phone: string) {
+  return {
+    id: "u1",
+    name: "Member",
+    phone,
+    role: {
+      name: "user",
+      permissions: [{ permission: { name: "view_users" } }],
+    },
+  };
+}
 
 beforeEach(() => {
   (getSmsSender as jest.Mock).mockReturnValue({ send: sendMock });
 });
 
 describe("POST /api/auth/send-otp", () => {
+  beforeEach(() => {
+    // The phone must belong to an account before a code is sent.
+    prismaMock.user.findUnique.mockResolvedValue({ id: "u1" });
+  });
+
   it("returns 200 with timing info and sends the code by SMS", async () => {
     prismaMock.otpCode.findFirst.mockResolvedValue(null);
     prismaMock.otpCode.count.mockResolvedValue(0);
@@ -44,6 +63,22 @@ describe("POST /api/auth/send-otp", () => {
       PHONE,
       expect.stringContaining("BhishiPay code is"),
     );
+  });
+
+  it("returns 404 and sends nothing for a number with no account", async () => {
+    prismaMock.user.findUnique.mockResolvedValue(null);
+
+    const res = await request(app)
+      .post("/api/auth/send-otp")
+      .send({ phone: "9123456789" });
+
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({
+      success: false,
+      message: "No account is registered for this phone number",
+    });
+    expect(prismaMock.otpCode.create).not.toHaveBeenCalled();
+    expect(sendMock).not.toHaveBeenCalled();
   });
 
   it("returns 400 for an invalid phone number", async () => {
@@ -75,6 +110,10 @@ describe("POST /api/auth/send-otp", () => {
 });
 
 describe("POST /api/auth/verify-otp", () => {
+  beforeEach(() => {
+    prismaMock.user.findUnique.mockResolvedValue(accountFor(PHONE));
+  });
+
   function storedOtp() {
     return {
       id: "otp1",
@@ -87,20 +126,11 @@ describe("POST /api/auth/verify-otp", () => {
     };
   }
 
-  it("returns 200 with a token and user for a correct code", async () => {
+  it("returns 200 with a token, role, and permissions for a correct code", async () => {
     prismaMock.otpCode.findFirst.mockResolvedValue(storedOtp());
     prismaMock.otpCode.update.mockResolvedValue({});
-    prismaMock.user.findUnique.mockResolvedValue(null);
-    prismaMock.role.findUnique.mockResolvedValue({
-      id: "role-user",
-      name: "user",
-    });
-    prismaMock.user.create.mockResolvedValue({
-      id: "u1",
-      name: "Member",
-      phone: PHONE,
-      role: { name: "user" },
-    });
+    prismaMock.user.findUnique.mockResolvedValue(accountFor(PHONE));
+    prismaMock.user.update.mockResolvedValue({});
 
     const res = await request(app)
       .post("/api/auth/verify-otp")
@@ -114,8 +144,21 @@ describe("POST /api/auth/verify-otp", () => {
       name: "Member",
       phone: PHONE,
       role: "user",
-      isNewUser: true,
+      permissions: ["view_users"],
     });
+  });
+
+  it("returns 404 for a correct code when the phone has no account", async () => {
+    prismaMock.otpCode.findFirst.mockResolvedValue(storedOtp());
+    prismaMock.otpCode.update.mockResolvedValue({});
+    prismaMock.user.findUnique.mockResolvedValue(null);
+
+    const res = await request(app)
+      .post("/api/auth/verify-otp")
+      .send({ phone: PHONE, otp: CODE });
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toBe("No account is registered for this phone number");
   });
 
   it("returns 401 'Invalid OTP' for a wrong code", async () => {
@@ -183,32 +226,44 @@ describe("POST /api/auth/verify-otp with the local test code", () => {
     process.env.NODE_ENV = savedNodeEnv;
   });
 
-  it("returns a token for 560142 in development, without a stored OTP", async () => {
+  it("returns a token for 560142 in development for a seeded account", async () => {
     process.env.NODE_ENV = "development";
-    prismaMock.user.findUnique.mockResolvedValue({
-      id: "u1",
-      name: "Member",
-      phone: PHONE,
-      role: { name: "user" },
-    });
+    const log = jest.spyOn(console, "log").mockImplementation(() => undefined);
+    prismaMock.user.findUnique.mockResolvedValue(accountFor(MEMBER_PHONE));
     prismaMock.user.update.mockResolvedValue({});
 
     const res = await request(app)
       .post("/api/auth/verify-otp")
-      .send({ phone: PHONE, otp: "560142" });
+      .send({ phone: MEMBER_PHONE, otp: "560142" });
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(typeof res.body.token).toBe("string");
     expect(res.body.user).toMatchObject({
       id: "u1",
-      phone: PHONE,
-      isNewUser: false,
+      phone: MEMBER_PHONE,
+      role: "user",
+      permissions: ["view_users"],
     });
+    log.mockRestore();
+  });
+
+  it("returns 404 for 560142 when the number is not in the database", async () => {
+    process.env.NODE_ENV = "development";
+    const log = jest.spyOn(console, "log").mockImplementation(() => undefined);
+    prismaMock.user.findUnique.mockResolvedValue(null);
+
+    const res = await request(app)
+      .post("/api/auth/verify-otp")
+      .send({ phone: "+919123456789", otp: "560142" });
+
+    expect(res.status).toBe(404);
+    log.mockRestore();
   });
 
   it("returns 401 for 560142 in production", async () => {
     process.env.NODE_ENV = "production";
+    prismaMock.user.findUnique.mockResolvedValue(accountFor(PHONE));
     prismaMock.otpCode.findFirst.mockResolvedValue(null);
 
     const res = await request(app)
@@ -223,18 +278,23 @@ describe("POST /api/auth/verify-otp with the local test code", () => {
   });
 });
 
-describe("POST /api/auth/send-otp for the dummy number", () => {
-  it("returns 200 with no SMS in development", async () => {
+describe("POST /api/auth/send-otp in local test mode", () => {
+  it("returns 200 for a seeded account in development and still sends the code", async () => {
     const savedNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "development";
     const log = jest.spyOn(console, "log").mockImplementation(() => undefined);
+    prismaMock.user.findUnique.mockResolvedValue({ id: "u1" });
+    prismaMock.otpCode.findFirst.mockResolvedValue(null);
+    prismaMock.otpCode.count.mockResolvedValue(0);
+    prismaMock.otpCode.create.mockResolvedValue({});
 
     const res = await request(app)
       .post("/api/auth/send-otp")
       .send({ phone: "1234567890" });
 
     expect(res.status).toBe(200);
-    expect(sendMock).not.toHaveBeenCalled();
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(sendMock.mock.calls[0][0]).toBe("+911234567890");
     log.mockRestore();
     process.env.NODE_ENV = savedNodeEnv;
   });

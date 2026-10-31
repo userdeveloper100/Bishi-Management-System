@@ -27,6 +27,11 @@ function secondsAgo(seconds: number) {
 }
 
 describe("otpService.sendOtp", () => {
+  beforeEach(() => {
+    // The phone must belong to an account before a code is sent.
+    prismaMock.user.findUnique.mockResolvedValue({ id: "u1" });
+  });
+
   it("creates a hashed OTP, sends the plain code by SMS, and returns no code", async () => {
     prismaMock.otpCode.findFirst.mockResolvedValue(null);
     prismaMock.otpCode.count.mockResolvedValue(0);
@@ -100,8 +105,25 @@ describe("otpService.sendOtp", () => {
   });
 });
 
+describe("otpService.sendOtp account check", () => {
+  it("rejects a number with no account with a 404, and sends no code or SMS", async () => {
+    prismaMock.user.findUnique.mockResolvedValue(null);
+
+    await expect(otpService.sendOtp("9876543210")).rejects.toMatchObject({
+      status: 404,
+      message: "No account is registered for this phone number",
+    });
+    expect(prismaMock.otpCode.create).not.toHaveBeenCalled();
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+});
+
 describe("otpService.verifyOtp", () => {
   const CODE = "482616";
+
+  beforeEach(() => {
+    prismaMock.user.findUnique.mockResolvedValue({ id: "u1" });
+  });
 
   function storedOtp(overrides: Record<string, unknown> = {}) {
     return {
@@ -207,10 +229,24 @@ describe("local test OTP (560142)", () => {
     USE_LOCAL_OTP: process.env.USE_LOCAL_OTP,
   };
 
+  beforeEach(() => {
+    prismaMock.user.findUnique.mockResolvedValue({ id: "u1" });
+  });
+
   afterEach(() => {
     process.env.NODE_ENV = savedEnv.NODE_ENV;
     if (savedEnv.USE_LOCAL_OTP === undefined) delete process.env.USE_LOCAL_OTP;
     else process.env.USE_LOCAL_OTP = savedEnv.USE_LOCAL_OTP;
+  });
+
+  it("refuses 560142 with a 404 when the number has no account, even in development", async () => {
+    process.env.NODE_ENV = "development";
+    prismaMock.user.findUnique.mockResolvedValue(null);
+
+    await expect(otpService.verifyOtp("9000000001", LOCAL_CODE)).rejects.toMatchObject({
+      status: 404,
+    });
+    expect(prismaMock.otpCode.findFirst).not.toHaveBeenCalled();
   });
 
   it("accepts 560142 when NODE_ENV=development, without a stored OTP", async () => {
@@ -271,6 +307,7 @@ describe("local test OTP (560142)", () => {
     prismaMock.otpCode.count.mockResolvedValue(0);
     prismaMock.otpCode.create.mockResolvedValue({});
 
+    prismaMock.user.findUnique.mockResolvedValue({ id: "u1" });
     await otpService.sendOtp("9000000001");
 
     expect(log).toHaveBeenCalledWith(
@@ -280,7 +317,11 @@ describe("local test OTP (560142)", () => {
   });
 });
 
-describe("local dummy login (+91 1234567890)", () => {
+describe("local test mode applies to any database account", () => {
+  beforeEach(() => {
+    prismaMock.user.findUnique.mockResolvedValue({ id: "u1" });
+  });
+
   const savedEnv = {
     NODE_ENV: process.env.NODE_ENV,
     USE_LOCAL_OTP: process.env.USE_LOCAL_OTP,
@@ -292,36 +333,53 @@ describe("local dummy login (+91 1234567890)", () => {
     else process.env.USE_LOCAL_OTP = savedEnv.USE_LOCAL_OTP;
   });
 
-  it("send-otp for the dummy number sends no SMS and stores nothing", async () => {
-    process.env.NODE_ENV = "development";
-    const log = jest.spyOn(console, "log").mockImplementation(() => undefined);
-
-    await expect(otpService.sendOtp("1234567890")).resolves.toMatchObject({
-      success: true,
-    });
-    expect(sendMock).not.toHaveBeenCalled();
-    expect(prismaMock.otpCode.create).not.toHaveBeenCalled();
-    log.mockRestore();
-  });
-
-  it("verify-otp accepts 560142 for the dummy number without a stored OTP", async () => {
+  it("verify-otp accepts 560142 for any existing account in development", async () => {
     process.env.NODE_ENV = "development";
     const log = jest.spyOn(console, "log").mockImplementation(() => undefined);
 
     await expect(otpService.verifyOtp("1234567890", "560142")).resolves.toBe(
       "+911234567890",
     );
+    await expect(otpService.verifyOtp("1234567892", "560142")).resolves.toBe(
+      "+911234567892",
+    );
     log.mockRestore();
   });
 
-  it("refuses the dummy number in production, even with USE_LOCAL_OTP=true", async () => {
-    process.env.NODE_ENV = "production";
-    process.env.USE_LOCAL_OTP = "true";
+  it("send-otp for an existing account still goes through the normal path", async () => {
+    process.env.NODE_ENV = "development";
+    const log = jest.spyOn(console, "log").mockImplementation(() => undefined);
+    prismaMock.otpCode.findFirst.mockResolvedValue(null);
+    prismaMock.otpCode.count.mockResolvedValue(0);
+    prismaMock.otpCode.create.mockResolvedValue({});
 
-    await expect(otpService.sendOtp("1234567890")).rejects.toMatchObject({
-      status: 400,
+    await expect(otpService.sendOtp("1234567890")).resolves.toMatchObject({
+      success: true,
+    });
+    expect(prismaMock.otpCode.create.mock.calls[0][0].data.phone).toBe(
+      "+911234567890",
+    );
+    log.mockRestore();
+  });
+
+  it("send-otp returns 404 for a number with no account in development", async () => {
+    process.env.NODE_ENV = "development";
+    prismaMock.user.findUnique.mockResolvedValue(null);
+
+    await expect(otpService.sendOtp("9000000001")).rejects.toMatchObject({
+      status: 404,
     });
     expect(prismaMock.otpCode.create).not.toHaveBeenCalled();
     expect(sendMock).not.toHaveBeenCalled();
+  });
+
+  it("refuses 560142 for an existing account in production, even with USE_LOCAL_OTP=true", async () => {
+    process.env.NODE_ENV = "production";
+    process.env.USE_LOCAL_OTP = "true";
+    prismaMock.otpCode.findFirst.mockResolvedValue(null);
+
+    await expect(otpService.verifyOtp("1234567890", "560142")).rejects.toMatchObject({
+      status: 401,
+    });
   });
 });

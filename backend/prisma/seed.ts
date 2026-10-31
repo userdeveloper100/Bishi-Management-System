@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { seedDefaultPhoneUsers } from "./seedUsers";
+import { SEED_SUPER_ADMIN_PHONE, seedDefaultPhoneUsers } from "./seedUsers";
 
 const prisma = new PrismaClient();
 
@@ -105,8 +105,21 @@ async function main(): Promise<void> {
     const superAdminPasswordHash = await bcrypt.hash("superadmin@123", 10);
     await prisma.user.upsert({
         where: { email: "superadmin@admin.com" },
-        update: { name: "Super Admin", password: superAdminPasswordHash, roleId: superAdminRole.id },
-        create: { name: "Super Admin", email: "superadmin@admin.com", password: superAdminPasswordHash, roleId: superAdminRole.id },
+        update: {
+            name: "Super Admin",
+            password: superAdminPasswordHash,
+            phone: SEED_SUPER_ADMIN_PHONE,
+            phoneVerified: true,
+            roleId: superAdminRole.id,
+        },
+        create: {
+            name: "Super Admin",
+            email: "superadmin@admin.com",
+            password: superAdminPasswordHash,
+            phone: SEED_SUPER_ADMIN_PHONE,
+            phoneVerified: true,
+            roleId: superAdminRole.id,
+        },
     });
 
     console.log("Seed completed. Super Admin: superadmin@admin.com (role super_admin)");

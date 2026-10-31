@@ -16,7 +16,7 @@ vi.mock('@/services/api.service', () => ({
 }));
 
 const PHONE = '+919876544821';
-const user = { id: 'u1', name: 'Sp', phone: PHONE, role: 'user', isNewUser: false };
+const user = { id: 'u1', name: 'Sp', phone: PHONE, role: 'user', permissions: [] };
 
 describe('auth store', () => {
   beforeEach(() => {

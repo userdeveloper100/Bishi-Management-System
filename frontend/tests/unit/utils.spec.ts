@@ -13,7 +13,7 @@ describe('toE164', () => {
     expect(toE164('919876543210')).toBe('+919876543210');
   });
 
-  test('rejects numbers that are too short, too long, or not starting with 6-9', () => {
+  test('rejects numbers that are too short, too long, or start with 0', () => {
     expect(toE164('12345')).toBeNull();
     expect(toE164('0123456789')).toBeNull();
     expect(toE164('98765432101')).toBeNull();
@@ -89,19 +89,10 @@ describe('groupAlertsByDay', () => {
   });
 });
 
-describe('toE164 with the local dummy number', () => {
-  test('accepts +911234567890 so the development sign-in can submit it', () => {
+describe('toE164 with seeded accounts', () => {
+  test('accepts the seeded numbers so the development sign-in can submit them', () => {
     expect(toE164('1234567890')).toBe('+911234567890');
-    expect(toE164('+91 1234567890')).toBe('+911234567890');
-  });
-
-  test('still rejects other numbers that start with 1', () => {
-    expect(toE164('1234567892')).toBeNull();
-  });
-});
-
-describe('toE164 with the seeded member number', () => {
-  test('accepts +911234567891 for local sign-in', () => {
-    expect(toE164('1234567891')).toBe('+911234567891');
+    expect(toE164('+91 1234567891')).toBe('+911234567891');
+    expect(toE164('1234567892')).toBe('+911234567892');
   });
 });

@@ -58,7 +58,7 @@ No SMS is needed for local testing. The OTP is fixed: `560142`.
 | --- | --- | --- | --- |
 | `+91 1234567890` | `560142` | Admin (seeded) | Signs in at once. No SMS is sent. |
 | `+91 1234567891` | `560142` | Member (seeded) | Signs in with the fixed code. |
-| Any valid Indian mobile number | `560142` | Created on first sign-in | Signs in with the fixed code. |
+| Any account in the database, such as the Super Admin `+91 1234567892` | `560142` | Existing account | Signs in with the fixed code. A number with no account returns 404. |
 
 The fixed code works only when the backend runs with `NODE_ENV=development` or `USE_LOCAL_OTP=true` in `backend/.env`. It is refused in production even when `USE_LOCAL_OTP=true` is set. The backend logs each use, for example `[otp] LOCAL DUMMY LOGIN: accepted test code for +911234567890`.
 
@@ -72,7 +72,7 @@ There are three tiers. The role lives on the user (`Role` table) and is carried 
 
 | Tier | Role | What it can do |
 | --- | --- | --- |
-| Super Admin | `super_admin` | Platform owner. Sees every group, can manage dues for any group, and has the admin-only user routes. Seeded locally as `superadmin@admin.com` / `superadmin@123`. |
+| Super Admin | `super_admin` | Platform owner. Sees every group, can manage dues for any group, and has the admin-only user routes. Seeded locally as `superadmin@admin.com` / `superadmin@123`, phone `+91 1234567892`. |
 | Admin (group organizer) | Member of a group with `Membership.role = "admin"` | Creates the group's dues, lists them, and marks payments as paid. Sees the groups they belong to. |
 | Member | `user` | Sees only the groups they belong to, and their own dues. Cannot create dues or mark payments. |
 

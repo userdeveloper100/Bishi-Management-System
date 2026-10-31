@@ -157,7 +157,8 @@ For development without SMS:
 | --- | --- | --- |
 | `+91 1234567890` | `560142` | The seeded admin. No SMS is sent. |
 | `+91 1234567891` | `560142` | The seeded member. |
-| Any valid mobile number | `560142` | Accepted in local mode. |
+| `+91 1234567892` | `560142` | The seeded Super Admin. |
+| Any account in the database | `560142` | Accepted in local mode. A number with no account is refused. |
 
 These work only when the backend runs with `NODE_ENV=development` or `USE_LOCAL_OTP=true`. The backend refuses them in production. The frontend accepts the two seeded numbers in the phone form so they can be submitted. The backend makes the final decision.
 

@@ -1,6 +1,5 @@
-import { seedDefaultPhoneUsers, DEFAULT_PHONE_USERS } from "../../prisma/seedUsers";
+import { seedDefaultPhoneUsers, DEFAULT_PHONE_USERS, SEED_SUPER_ADMIN_PHONE } from "../../prisma/seedUsers";
 import { normalizePhone } from "../../src/utils/phone";
-import { statusOf } from "../helpers/statusOf";
 
 describe("default phone users", () => {
   it("lists the admin on +911234567890 and the member on +911234567891", () => {
@@ -30,29 +29,9 @@ describe("default phone users", () => {
   });
 });
 
-describe("local test phones at sign-in", () => {
-  const saved = { NODE_ENV: process.env.NODE_ENV, USE_LOCAL_OTP: process.env.USE_LOCAL_OTP };
-
-  afterEach(() => {
-    process.env.NODE_ENV = saved.NODE_ENV;
-    if (saved.USE_LOCAL_OTP === undefined) delete process.env.USE_LOCAL_OTP;
-    else process.env.USE_LOCAL_OTP = saved.USE_LOCAL_OTP;
-  });
-
-  it("accepts the seeded member number in local development", () => {
-    process.env.NODE_ENV = "development";
+describe("seeded phone numbers", () => {
+  it("are valid input, so the seeded accounts can be looked up at sign-in", () => {
     expect(normalizePhone("1234567891")).toBe("+911234567891");
-  });
-
-  it("refuses the seeded member number when local test mode is off", () => {
-    process.env.NODE_ENV = "test";
-    delete process.env.USE_LOCAL_OTP;
-    expect(statusOf(() => normalizePhone("+911234567891"))).toBe(400);
-  });
-
-  it("refuses the seeded member number in production even with USE_LOCAL_OTP=true", () => {
-    process.env.NODE_ENV = "production";
-    process.env.USE_LOCAL_OTP = "true";
-    expect(statusOf(() => normalizePhone("+911234567891"))).toBe(400);
+    expect(normalizePhone(SEED_SUPER_ADMIN_PHONE)).toBe("+911234567892");
   });
 });

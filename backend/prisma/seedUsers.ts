@@ -1,8 +1,11 @@
 // prisma/seedUsers.ts
 // Default phone-login accounts for local development. Phone numbers are stored in E.164 form so they
-// match the lookup done at login. Both numbers are local test phones (see src/utils/otp.ts).
+// match the lookup done at login. Login only succeeds for numbers that exist in the User table.
 import type { PrismaClient } from "@prisma/client";
-import { LOCAL_DUMMY_PHONE, LOCAL_MEMBER_PHONE } from "../src/utils/otp";
+
+export const SEED_ADMIN_PHONE = "+911234567890";
+export const SEED_MEMBER_PHONE = "+911234567891";
+export const SEED_SUPER_ADMIN_PHONE = "+911234567892";
 
 export type SeedRole = "admin" | "user";
 
@@ -13,8 +16,8 @@ export interface SeedPhoneUser {
 }
 
 export const DEFAULT_PHONE_USERS: readonly SeedPhoneUser[] = [
-    { phone: LOCAL_DUMMY_PHONE, name: "Admin User", role: "admin" },
-    { phone: LOCAL_MEMBER_PHONE, name: "Member User", role: "user" },
+    { phone: SEED_ADMIN_PHONE, name: "Admin User", role: "admin" },
+    { phone: SEED_MEMBER_PHONE, name: "Member User", role: "user" },
 ];
 
 /** Create or update the default phone users. Safe to run more than once. */

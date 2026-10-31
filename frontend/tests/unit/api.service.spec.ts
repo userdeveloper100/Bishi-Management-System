@@ -47,7 +47,7 @@ describe('api.service', () => {
       data: {
         success: true,
         token: 'jwt-1',
-        user: { id: 'u1', name: 'Sp', phone: '+919876544821', role: 'user', isNewUser: false },
+        user: { id: 'u1', name: 'Sp', phone: '+919876544821', role: 'user', permissions: [] },
       },
     });
 

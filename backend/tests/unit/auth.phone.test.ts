@@ -1,57 +1,43 @@
 import jwt from "jsonwebtoken";
 import { prismaMock } from "../helpers/prismaMock";
-import { authService } from "../../src/services/auth.service";
+import { authService, toAccess } from "../../src/services/auth.service";
 
 jest.mock("../../src/prismaClient", () => ({
   prisma: require("../helpers/prismaMock").prismaMock,
 }));
 
-const PHONE = "+919876543210";
+const PHONE = "+911234567891";
+
+/** A Role row as Prisma returns it with its permissions. */
+function roleWith(name: string, permissions: string[]) {
+  return {
+    name,
+    permissions: permissions.map((permission) => ({ permission: { name: permission } })),
+  };
+}
 
 describe("authService.loginWithPhone", () => {
-  it("creates a Member account on first sign-in and marks it as a new user", async () => {
+  it("rejects a phone number with no account, and changes nothing", async () => {
     prismaMock.user.findUnique.mockResolvedValue(null);
-    prismaMock.role.findUnique.mockResolvedValue({
-      id: "role-user",
-      name: "user",
-    });
-    prismaMock.user.create.mockResolvedValue({
-      id: "u1",
-      name: "Member",
-      phone: PHONE,
-      role: { name: "user" },
-    });
 
-    const result = await authService.loginWithPhone(PHONE);
-
-    const created = prismaMock.user.create.mock.calls[0][0].data;
-    expect(created).toEqual({
-      name: "Member",
-      phone: PHONE,
-      phoneVerified: true,
-      roleId: "role-user",
+    await expect(authService.loginWithPhone(PHONE)).rejects.toMatchObject({
+      status: 404,
+      message: "No account is registered for this phone number",
     });
-    expect(result.user).toEqual({
-      id: "u1",
-      name: "Member",
-      phone: PHONE,
-      role: "user",
-      isNewUser: true,
-    });
+    expect(prismaMock.user.update).not.toHaveBeenCalled();
   });
 
-  it("signs in an existing account without creating a new one", async () => {
+  it("signs in an existing account and returns its role and permissions", async () => {
     prismaMock.user.findUnique.mockResolvedValue({
       id: "u2",
       name: "Priya",
       phone: PHONE,
-      role: { name: "admin" },
+      role: roleWith("admin", ["view_users", "delete_users"]),
     });
     prismaMock.user.update.mockResolvedValue({});
 
     const result = await authService.loginWithPhone(PHONE);
 
-    expect(prismaMock.user.create).not.toHaveBeenCalled();
     expect(prismaMock.user.update).toHaveBeenCalledWith({
       where: { id: "u2" },
       data: { phoneVerified: true },
@@ -61,16 +47,16 @@ describe("authService.loginWithPhone", () => {
       name: "Priya",
       phone: PHONE,
       role: "admin",
-      isNewUser: false,
+      permissions: ["delete_users", "view_users"],
     });
   });
 
-  it("issues a JWT with the user id and role", async () => {
+  it("puts the role and permissions into the JWT", async () => {
     prismaMock.user.findUnique.mockResolvedValue({
       id: "u3",
-      name: "Amit",
+      name: "Super",
       phone: PHONE,
-      role: null,
+      role: roleWith("super_admin", ["view_users"]),
     });
     prismaMock.user.update.mockResolvedValue({});
 
@@ -78,17 +64,46 @@ describe("authService.loginWithPhone", () => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       userId: string;
       role: string;
+      permissions: string[];
     };
 
     expect(decoded.userId).toBe("u3");
-    expect(decoded.role).toBe("user");
+    expect(decoded.role).toBe("super_admin");
+    expect(decoded.permissions).toEqual(["view_users"]);
+  });
+
+  it("falls back to the user role with no permissions when the account has no role", async () => {
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: "u4",
+      name: "Amit",
+      phone: PHONE,
+      role: null,
+    });
+    prismaMock.user.update.mockResolvedValue({});
+
+    const result = await authService.loginWithPhone(PHONE);
+
+    expect(result.user).toMatchObject({ role: "user", permissions: [] });
+  });
+});
+
+describe("toAccess", () => {
+  it("returns sorted permission names", () => {
+    expect(toAccess(roleWith("admin", ["view_users", "delete_users"]))).toEqual({
+      role: "admin",
+      permissions: ["delete_users", "view_users"],
+    });
+  });
+
+  it("defaults to the user role when there is no role row", () => {
+    expect(toAccess(null)).toEqual({ role: "user", permissions: [] });
   });
 });
 
 describe("authService.login (email) with phone-only accounts", () => {
   it("rejects a phone-only account, which has no password", async () => {
     prismaMock.user.findUnique.mockResolvedValue({
-      id: "u4",
+      id: "u5",
       name: "Phone only",
       email: null,
       password: null,

@@ -21,7 +21,7 @@ The frontend is in [../frontend](../frontend/README.md). The monorepo overview i
 
 - Prisma models for users, roles, permissions, groups, bishis, transactions, memberships, messages, notifications, audit logs, OTP codes, and contributions (dues).
 - Phone OTP sign-in with hashed codes, expiry, attempt limits, resend cooldown, and hourly send caps.
-- Local dummy login (`+911234567890` and the seeded member number) with OTP `560142`, active only when `NODE_ENV=development` or `USE_LOCAL_OTP=true`. Console logs mark each use.
+- Local test code `560142`, active only when `NODE_ENV=development` or `USE_LOCAL_OTP=true`. It works for any phone number that belongs to an account in the database, and never in production. Console logs mark each use.
 - Production guard: the local bypass is refused whenever `NODE_ENV=production`, even if `USE_LOCAL_OTP=true` is set.
 - Role tiers: `super_admin`, `admin` (existing platform role, kept for compatibility), and `user`. Group admin rights come from the membership row.
 - Manual payment marking: `POST /api/contributions/:id/mark-paid` with method `CASH` or `UPI`, a timestamp, the recorder, and an audit entry in one transaction. Paying an already-paid due returns 409.
@@ -181,11 +181,11 @@ The API runs at `http://localhost:5000`. Swagger UI is at `http://localhost:5000
 ### Phone OTP (used by the app)
 
 1. `POST /api/auth/send-otp` with `{ "phone": "9876543210" }`. Returns the expiry and the resend cooldown, never the code.
-2. `POST /api/auth/verify-otp` with `{ "phone": "9876543210", "otp": "482616" }`. Returns `{ success, token, user }`. A new phone number creates a `user` account named "Member".
+2. `POST /api/auth/verify-otp` with `{ "phone": "9876543210", "otp": "482616" }`. Returns `{ success, token, user }`. A phone number must belong to an existing account. Send-otp and verify-otp both return 404 for any other number, and no code is sent. The response and the JWT carry the user's role and permission names from the database.
 
 Local test login (development only):
-- `+911234567890`: send-otp sends nothing, and verify-otp accepts `560142`.
-- Any valid number, including `+911234567891`: verify-otp accepts `560142`.
+- Any account in the database, including `+911234567890`, `+911234567891` and the Super Admin `+911234567892`: verify-otp accepts `560142`. send-otp still sends the real code through the console sender.
+- A number with no account gets 404 from both send-otp and verify-otp, even with local test mode on.
 - Set `NODE_ENV=production`: the bypass is refused with `401`. The dummy number is refused with `400`.
 
 Console output in local mode:

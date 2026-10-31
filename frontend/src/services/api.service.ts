@@ -31,8 +31,10 @@ export interface AuthUser {
   id: string;
   name: string;
   phone: string;
+  /** Role name from the database: super_admin, admin, or user. */
   role: string;
-  isNewUser: boolean;
+  /** Permission names granted to the role, from the database. */
+  permissions: string[];
 }
 
 export interface VerifyOtpResponse {
