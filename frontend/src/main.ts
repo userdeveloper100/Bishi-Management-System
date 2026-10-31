@@ -22,9 +22,9 @@ import '@ionic/vue/css/text-transformation.css';
 import '@ionic/vue/css/flex-utils.css';
 import '@ionic/vue/css/display.css';
 
-/* Theme variables (Ionic), then Tailwind utilities for the screen designs */
-import './theme/variables.css';
-import './styles/tailwind.css';
+/* Ionic theme variables, then the BhishiPay utility and component styles */
+import './theme/ionic.scss';
+import './styles/main.scss';
 
 const app = createApp(App).use(IonicVue).use(createPinia()).use(router).use(i18n);
 

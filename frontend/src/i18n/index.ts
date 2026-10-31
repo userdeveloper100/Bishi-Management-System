@@ -1,10 +1,18 @@
 import { createI18n } from 'vue-i18n';
 
+import bn from '@/locales/bn.json';
 import en from '@/locales/en.json';
+import gu from '@/locales/gu.json';
 import hi from '@/locales/hi.json';
+import kn from '@/locales/kn.json';
 import mr from '@/locales/mr.json';
+import mwr from '@/locales/mwr.json';
+import pa from '@/locales/pa.json';
+import ta from '@/locales/ta.json';
+import te from '@/locales/te.json';
 
-export const APP_LOCALES = ['en', 'hi', 'mr'] as const;
+/** Every language the app can show. Keep in step with the backend SUPPORTED_LANGUAGES list. */
+export const APP_LOCALES = ['en', 'hi', 'mr', 'ta', 'te', 'kn', 'bn', 'pa', 'gu', 'mwr'] as const;
 export type AppLocale = (typeof APP_LOCALES)[number];
 
 const LOCALE_STORAGE_KEY = 'bhishipay.locale';
@@ -28,7 +36,7 @@ export const i18n = createI18n({
   legacy: false,
   locale: storedLocale(),
   fallbackLocale: 'en',
-  messages: { en, hi, mr },
+  messages: { en, hi, mr, ta, te, kn, bn, pa, gu, mwr },
 });
 
 document.documentElement.lang = i18n.global.locale.value;

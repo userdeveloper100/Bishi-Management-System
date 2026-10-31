@@ -27,6 +27,7 @@ model User {
   notifications Notification[]
   messages      Message[]
   membership    Membership[]
+  contributions Contribution[]
 
   created_by    String?
   created_date  DateTime @default(now())
@@ -62,15 +63,16 @@ model RolePermission {
 }
 
 model Group {
-  id                  String    @id @default(uuid())
+  id                  String         @id @default(uuid())
   name                String
-  users               User[]    @relation("UserGroups")
+  users               User[]         @relation("UserGroups")
   bishis              Bishi[]
   Message             Message[]
   membership          Membership[]
-  cycleMonths         Int       @default(10)
-  monthlyContribution Float     @default(0)
-  status              String    @default("OPEN") // "BIDDING" | "OPEN" | "CLOSED"
+  contributions       Contribution[]
+  cycleMonths         Int            @default(10)
+  monthlyContribution Float          @default(0)
+  status              String         @default("OPEN") // "BIDDING" | "OPEN" | "CLOSED"
   nextBidRound        Int?
   nextBidAt           DateTime?
 
@@ -166,18 +168,39 @@ model AuditLog {
 }
 
 model Membership {
-  id            String   @id @default(uuid())
-  userId        String
-  groupId       String
+  id      String @id @default(uuid())
+  userId  String
+  groupId String
 
-  user          User     @relation(fields: [userId], references: [id])
-  group         Group    @relation(fields: [groupId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+  group Group @relation(fields: [groupId], references: [id])
 
-  role          String?  // e.g., "member", "admin" if you want roles
-  status        String?  // e.g., "pending", "accepted"
+  role   String? // e.g., "member", "admin" if you want roles
+  status String? // e.g., "pending", "accepted"
 
   created_by    String?
   created_date  DateTime @default(now())
   modified_by   String?
   modified_date DateTime @updatedAt
+}
+
+// Monthly dues owed by a member to a group for one period (for example "2026-11").
+// Admins mark a due as PAID when the member settles it in cash or by direct UPI.
+model Contribution {
+  id         String    @id @default(uuid())
+  groupId    String
+  group      Group     @relation(fields: [groupId], references: [id])
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  period     String // "YYYY-MM"
+  amount     Float
+  status     String    @default("PENDING") // "PENDING" | "PAID"
+  method     String? // "CASH" | "UPI" (set when marked paid)
+  paidAt     DateTime?
+  markedById String? // admin who recorded the payment
+
+  created_date  DateTime @default(now())
+  modified_date DateTime @updatedAt
+
+  @@unique([groupId, userId, period])
 }

@@ -1,24 +1,17 @@
 <template>
   <section>
-    <h2 class="mb-2 px-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+    <h2 class="mb-2 px-1 fs-12 fw-semibold uppercase tracking-12 text-slate-400">
       {{ title }}
     </h2>
-    <ul
-      class="divide-y divide-slate-100 overflow-hidden rounded-[24px] border border-slate-100 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.04)]"
-    >
+    <ul class="divide-y overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-soft">
       <li v-for="row in rows" :key="row.id">
-        <button
-          type="button"
-          class="flex w-full items-center gap-4 px-5 py-4 text-left"
-          :aria-label="row.label"
-          @click="emit('select', row.id)"
-        >
-          <ion-icon :name="row.icon" class="shrink-0 text-[20px] text-slate-600" aria-hidden="true" />
+        <button type="button" class="bh-row" :aria-label="row.label" @click="emit('select', row.id)">
+          <ion-icon :name="row.icon" class="shrink-0 fs-20 text-slate-600" aria-hidden="true" />
           <div class="min-w-0 flex-1">
-            <p class="text-[15px] text-midnight">{{ row.label }}</p>
-            <p v-if="row.sublabel" class="text-[13px] text-slate-500">{{ row.sublabel }}</p>
+            <p class="fs-15 text-midnight">{{ row.label }}</p>
+            <p v-if="row.sublabel" class="fs-13 text-slate-500">{{ row.sublabel }}</p>
           </div>
-          <span v-if="row.value" class="text-[13px] font-medium" :class="toneClass(row.tone)">
+          <span v-if="row.value" class="fs-13 fw-medium" :class="toneClass(row.tone)">
             {{ row.value }}
           </span>
           <ion-icon name="chevron-forward-outline" class="shrink-0 text-slate-300" aria-hidden="true" />

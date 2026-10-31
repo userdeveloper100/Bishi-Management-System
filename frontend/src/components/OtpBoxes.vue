@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-between gap-2" role="group" :aria-label="$t('otp.oneTimeCode')">
+  <div class="d-flex items-center justify-between gap-2" role="group" :aria-label="$t('otp.oneTimeCode')">
     <input
       v-for="(digit, index) in slots"
       :key="index"
@@ -7,10 +7,10 @@
       type="text"
       inputmode="numeric"
       autocomplete="one-time-code"
+      class="bh-otp-box"
       :aria-label="$t('otp.digitOf', { index: index + 1, length })"
       :value="digit"
       :disabled="disabled"
-      class="h-14 w-full min-w-0 rounded-2xl border border-slate-200 bg-white text-center text-[22px] font-semibold text-midnight shadow-[0_1px_2px_rgba(15,23,42,0.04)] outline-none transition focus:border-champagne focus:ring-2 focus:ring-champagne/20 disabled:opacity-60"
       @input="onInput(index, $event)"
       @keydown="onKeydown(index, $event)"
       @focus="($event.target as HTMLInputElement).select()"

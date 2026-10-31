@@ -93,6 +93,25 @@
     "today": "Today",
     "tomorrow": "Tomorrow"
   },
+  "dues": {
+    "title": "Collections",
+    "subtitle": "Record member payments received in cash or by UPI",
+    "open": "Dues",
+    "pending": "Pending",
+    "paid": "Paid",
+    "pendingTotal": "{amount} still to collect",
+    "generate": "Create dues for {period}",
+    "generated": "{count} dues created for {period}.",
+    "empty": "No pending dues. Create dues for this month to start collecting.",
+    "markPaid": "Mark paid",
+    "confirmTitle": "Record payment",
+    "confirmBody": "Choose how {name} paid {amount}.",
+    "cash": "Cash",
+    "upi": "UPI",
+    "confirm": "Confirm payment",
+    "paidOn": "Paid {date} by {method}",
+    "error": "Could not record the payment. Try again."
+  },
   "alerts": {
     "title": "Alerts",
     "newCount": "{count} new",

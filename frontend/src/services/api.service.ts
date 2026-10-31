@@ -143,6 +143,47 @@ export async function updateProfile(patch: ProfileUpdate): Promise<ProfileData> 
   return data.data;
 }
 
+/* ---------- Dues and manual payments (group admins) ---------- */
+
+export type DueStatus = 'PENDING' | 'PAID';
+export type PaymentMethod = 'CASH' | 'UPI';
+
+export interface Due {
+  id: string;
+  groupId: string;
+  userId: string;
+  period: string;
+  amount: number;
+  status: DueStatus;
+  method: PaymentMethod | null;
+  paidAt: string | null;
+  /** Included by the list endpoint only. The mark-paid response leaves it out. */
+  user: { id: string; name: string; phone: string | null };
+}
+
+export async function fetchDues(groupId: string, status?: DueStatus): Promise<Due[]> {
+  const { data } = await http.get<Envelope<Due[]>>('/contributions', { params: { groupId, status } });
+  return data.data;
+}
+
+export async function generateDues(
+  groupId: string,
+  period: string,
+  amount: number,
+): Promise<{ period: string; created: number }> {
+  const { data } = await http.post<Envelope<{ period: string; created: number }>>('/contributions/generate', {
+    groupId,
+    period,
+    amount,
+  });
+  return data.data;
+}
+
+export async function markDuePaid(id: string, method: PaymentMethod): Promise<Due> {
+  const { data } = await http.post<Envelope<Due>>(`/contributions/${id}/mark-paid`, { method });
+  return data.data;
+}
+
 // Backend errors look like { success: false, message: "..." }.
 export function errorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {

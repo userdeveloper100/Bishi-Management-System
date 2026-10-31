@@ -1,0 +1,41 @@
+@use 'sass:map';
+@use 'sass:math';
+@use 'tokens' as t;
+
+// Each mixin generates one family of utility classes from a token map.
+
+@mixin spacing($short, $properties) {
+  @each $key, $value in t.$space {
+    .#{$short}-#{$key} {
+      @each $property in $properties {
+        #{$property}: $value;
+      }
+    }
+  }
+}
+
+@mixin colour-utilities($prefix, $property) {
+  @each $name, $value in t.$colors {
+    .#{$prefix}-#{$name} {
+      #{$property}: $value;
+    }
+  }
+}
+
+@mixin tint-utilities($prefix, $property) {
+  @each $name, $levels in t.$tints {
+    @each $level in $levels {
+      .#{$prefix}-#{$name}-#{$level} {
+        #{$property}: rgba(map.get(t.$colors, $name), math.div($level, 100));
+      }
+    }
+  }
+}
+
+@mixin token-utilities($prefix, $property, $map) {
+  @each $key, $value in $map {
+    .#{$prefix}-#{$key} {
+      #{$property}: $value;
+    }
+  }
+}

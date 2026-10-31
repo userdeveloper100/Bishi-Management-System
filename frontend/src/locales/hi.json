@@ -93,6 +93,25 @@
     "today": "आज",
     "tomorrow": "कल"
   },
+  "dues": {
+    "title": "वसूली",
+    "subtitle": "सदस्यों से नकद या UPI से मिले भुगतान दर्ज करें",
+    "open": "बकाया",
+    "pending": "बाकी",
+    "paid": "चुकाया गया",
+    "pendingTotal": "{amount} अभी वसूलने हैं",
+    "generate": "{period} के लिए बकाया बनाएं",
+    "generated": "{period} के लिए {count} बकाया बनाए गए।",
+    "empty": "कोई बकाया नहीं है। वसूली शुरू करने के लिए इस महीने का बकाया बनाएं।",
+    "markPaid": "भुगतान हुआ",
+    "confirmTitle": "भुगतान दर्ज करें",
+    "confirmBody": "चुनें कि {name} ने {amount} कैसे चुकाए।",
+    "cash": "नकद",
+    "upi": "UPI",
+    "confirm": "भुगतान की पुष्टि करें",
+    "paidOn": "{date} को {method} से चुकाया",
+    "error": "भुगतान दर्ज नहीं हो सका। फिर से कोशिश करें."
+  },
   "alerts": {
     "title": "अलर्ट",
     "newCount": "{count} नए",

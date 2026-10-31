@@ -1,17 +1,13 @@
 <template>
-  <div class="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1" role="tablist" :aria-label="$t('alerts.filterAria')">
+  <div class="d-flex gap-2 mx-n5 overflow-x-auto px-5 pb-1" role="tablist" :aria-label="$t('alerts.filterAria')">
     <button
       v-for="option in options"
       :key="option.key"
       type="button"
       role="tab"
+      class="bh-pill"
+      :class="{ 'bh-pill--active': option.key === modelValue }"
       :aria-selected="option.key === modelValue"
-      class="shrink-0 rounded-full border px-4 py-2 text-[14px] font-medium transition-colors"
-      :class="
-        option.key === modelValue
-          ? 'border-midnight bg-midnight text-white'
-          : 'border-slate-200 bg-white text-slate-700'
-      "
       @click="emit('update:modelValue', option.key)"
     >
       <span v-if="option.icon" class="mr-1" aria-hidden="true">{{ option.icon }}</span>

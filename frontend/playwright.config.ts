@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = 'http://localhost:5173';
+// E2E_PORT lets a second dev server run on another port, for example with a different API address.
+const port = Number(process.env.E2E_PORT ?? 5173);
+const baseURL = `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -19,7 +21,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev -- --port 5173 --strictPort',
+    command: `npm run dev -- --port ${port} --strictPort`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

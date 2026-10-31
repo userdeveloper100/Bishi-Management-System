@@ -1,0 +1,341 @@
+@use 'sass:map';
+@use 'tokens' as t;
+@use 'mixins' as m;
+
+// Borders come first: their default colour can then be overridden by the colour utilities below.
+.border {
+  border: 1px solid map.get(t.$colors, 'slate-200');
+}
+
+.border-t {
+  border-top: 1px solid map.get(t.$colors, 'slate-200');
+}
+
+.border-r {
+  border-right: 1px solid map.get(t.$colors, 'slate-200');
+}
+
+.border-dashed {
+  border-style: dashed;
+}
+
+// ---------- Colour ----------
+@include m.colour-utilities('bg', 'background-color');
+@include m.colour-utilities('text', 'color');
+@include m.colour-utilities('border', 'border-color');
+@include m.colour-utilities('stroke', 'stroke');
+@include m.tint-utilities('bg', 'background-color');
+@include m.tint-utilities('border', 'border-color');
+
+.bg-transparent {
+  background-color: transparent;
+}
+
+// ---------- Spacing ----------
+@include m.spacing('p', ('padding'));
+@include m.spacing('px', ('padding-left', 'padding-right'));
+@include m.spacing('py', ('padding-top', 'padding-bottom'));
+@include m.spacing('pt', ('padding-top'));
+@include m.spacing('pb', ('padding-bottom'));
+@include m.spacing('m', ('margin'));
+@include m.spacing('mx', ('margin-left', 'margin-right'));
+@include m.spacing('my', ('margin-top', 'margin-bottom'));
+@include m.spacing('mt', ('margin-top'));
+@include m.spacing('mb', ('margin-bottom'));
+@include m.spacing('gap', ('gap'));
+
+// Negative horizontal margins, used to let scrollable pills run to the screen edge.
+.mx-n4 {
+  margin-left: -16px;
+  margin-right: -16px;
+}
+
+.mx-n5 {
+  margin-left: -20px;
+  margin-right: -20px;
+}
+
+// Vertical rhythm between children: space-y-4 spaces every child after the first.
+@each $key, $value in t.$space {
+  .space-y-#{$key} > * + * {
+    margin-top: $value;
+  }
+}
+
+// ---------- Sizing ----------
+@each $key, $value in t.$space {
+  .w-#{$key} {
+    width: $value;
+  }
+
+  .h-#{$key} {
+    height: $value;
+  }
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.min-h-full {
+  min-height: 100%;
+}
+
+.w-fit {
+  width: fit-content;
+}
+
+.h-px {
+  height: 1px;
+}
+
+.min-w-0 {
+  min-width: 0;
+}
+
+.min-w-72 {
+  min-width: 72px;
+}
+
+@include m.token-utilities('max-w', 'max-width', t.$max-widths);
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mt-auto {
+  margin-top: auto;
+}
+
+// ---------- Typography ----------
+@include m.token-utilities('fs', 'font-size', t.$font-sizes);
+@include m.token-utilities('fw', 'font-weight', t.$font-weights);
+@include m.token-utilities('tracking', 'letter-spacing', t.$letter-spacings);
+
+.lh-snug {
+  line-height: 1.375;
+}
+
+.lh-relaxed {
+  line-height: 1.625;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.underline-offset-2 {
+  text-underline-offset: 2px;
+}
+
+// ---------- Display and flex ----------
+.d-block {
+  display: block;
+}
+
+.d-none {
+  display: none;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.d-inline-flex {
+  display: inline-flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.shrink-0 {
+  flex-shrink: 0;
+}
+
+// ---------- Position and layering ----------
+.position-relative {
+  position: relative;
+}
+
+.position-absolute {
+  position: absolute;
+}
+
+.position-fixed {
+  position: fixed;
+}
+
+.inset-0 {
+  inset: 0;
+}
+
+.inset-6 {
+  inset: 24px;
+}
+
+.inset-12 {
+  inset: 48px;
+}
+
+.inset-x-4 {
+  left: 16px;
+  right: 16px;
+}
+
+.top-50p {
+  top: 50%;
+}
+
+.top-58p {
+  top: 58%;
+}
+
+.left-50p {
+  left: 50%;
+}
+
+.bottom-n1 {
+  bottom: -4px;
+}
+
+.right-n1 {
+  right: -4px;
+}
+
+.translate-center {
+  transform: translate(-50%, -50%);
+}
+
+@each $key, $value in t.$space {
+  .top-#{$key} {
+    top: $value;
+  }
+
+  .right-#{$key} {
+    right: $value;
+  }
+
+  .bottom-#{$key} {
+    bottom: $value;
+  }
+
+  .left-#{$key} {
+    left: $value;
+  }
+}
+
+@include m.token-utilities('z', 'z-index', t.$z-indexes);
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+@include m.token-utilities('rounded', 'border-radius', t.$radii);
+@include m.token-utilities('shadow', 'box-shadow', t.$shadows);
+
+// Dividers between list rows: divide-y adds a line above every row after the first.
+.divide-y > * + * {
+  border-top: 1px solid map.get(t.$colors, 'slate-100');
+}
+
+.divide-y-slate-200 > * + * {
+  border-top-color: map.get(t.$colors, 'slate-200');
+}
+
+// ---------- Effects ----------
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.opacity-60 {
+  opacity: 0.6;
+}
+
+.blur-xl {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.outline-none {
+  outline: none;
+}
+
+.transition {
+  transition: all 0.2s ease;
+}
+
+.transition-colors {
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+.scroll-list {
+  max-height: 50vh;
+  overflow-y: auto;
+}

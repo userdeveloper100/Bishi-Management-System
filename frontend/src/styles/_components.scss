@@ -1,0 +1,257 @@
+@use 'sass:map';
+@use 'tokens' as t;
+
+// Component classes for elements with interactive states (focus, disabled, active).
+// Layout and spacing still come from the utility classes in templates.
+
+$midnight: map.get(t.$colors, 'midnight');
+$champagne: map.get(t.$colors, 'champagne');
+$mint: map.get(t.$colors, 'mint');
+
+// Safe-area padding so headers clear the notch.
+.pt-safe {
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+}
+
+// Input field with a leading country code.
+.bh-field {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  border: 1px solid map.get(t.$colors, 'slate-200');
+  border-radius: 16px;
+  background: map.get(t.$colors, 'white');
+  box-shadow: map.get(t.$shadows, 'sm');
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: $champagne;
+    box-shadow: 0 0 0 2px rgba($champagne, 0.2);
+  }
+
+  &--error {
+    border-color: map.get(t.$colors, 'red-300');
+  }
+
+  &__input {
+    height: 100%;
+    min-width: 0;
+    flex: 1 1 0%;
+    padding: 0 16px;
+    background: transparent;
+    font-size: 16px;
+    color: $midnight;
+    outline: none;
+
+    &::placeholder {
+      color: map.get(t.$colors, 'slate-400');
+    }
+  }
+}
+
+// Full-width primary button with the midnight fill.
+.bh-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 56px;
+  padding: 0 24px;
+  border-radius: 16px;
+  background: $midnight;
+  color: map.get(t.$colors, 'white');
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: map.get(t.$shadows, 'cta');
+  transition: opacity 0.2s ease;
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+// Small text button in gold, for links such as "Change number".
+.bh-link {
+  color: map.get(t.$colors, 'champagne-dark');
+  font-weight: 500;
+  transition: color 0.2s ease;
+
+  &:disabled {
+    color: map.get(t.$colors, 'slate-400');
+  }
+}
+
+// One digit box of the OTP grid.
+.bh-otp-box {
+  width: 100%;
+  min-width: 0;
+  height: 56px;
+  border: 1px solid map.get(t.$colors, 'slate-200');
+  border-radius: 16px;
+  background: map.get(t.$colors, 'white');
+  box-shadow: map.get(t.$shadows, 'sm');
+  color: $midnight;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:focus {
+    border-color: $champagne;
+    box-shadow: 0 0 0 2px rgba($champagne, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+// Floating glass tab bar.
+.bh-tabbar {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: map.get(t.$shadows, 'glass');
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.bh-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 72px;
+  padding: 8px 12px;
+  border-radius: 16px;
+  color: map.get(t.$colors, 'slate-500');
+  font-size: 12px;
+  font-weight: 500;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+
+  &--active {
+    background: rgba($mint, 0.1);
+    color: $mint;
+  }
+}
+
+// Filter pills (Alerts).
+.bh-pill {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border: 1px solid map.get(t.$colors, 'slate-200');
+  border-radius: 9999px;
+  background: map.get(t.$colors, 'white');
+  color: map.get(t.$colors, 'slate-700');
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+  &--active {
+    border-color: $midnight;
+    background: $midnight;
+    color: map.get(t.$colors, 'white');
+  }
+}
+
+// Group status badges.
+.bh-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+
+  &--bidding {
+    background: rgba(map.get(t.$colors, 'champagne-light'), 0.35);
+    color: map.get(t.$colors, 'champagne-dark');
+  }
+
+  &--open {
+    background: rgba($mint, 0.1);
+    color: $mint;
+  }
+
+  &--closed {
+    background: map.get(t.$colors, 'slate-100');
+    color: map.get(t.$colors, 'slate-500');
+  }
+}
+
+// Alert row: the first row has no top padding and the last has no bottom padding.
+.bh-alert-row {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+// Icon tile in the alert list.
+.bh-tile {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+
+  &--mint {
+    background: rgba($mint, 0.1);
+    color: $mint;
+  }
+
+  &--neutral {
+    background: map.get(t.$colors, 'slate-100');
+    color: map.get(t.$colors, 'slate-600');
+  }
+
+  &--gold {
+    background: rgba(map.get(t.$colors, 'champagne-light'), 0.35);
+    color: map.get(t.$colors, 'champagne-dark');
+  }
+}
+
+// Settings row button.
+.bh-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  text-align: left;
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}

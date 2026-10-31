@@ -1,0 +1,32 @@
+@use 'sass:map';
+@use '../styles/tokens' as t;
+
+// Ionic theme variables mapped to the BhishiPay palette.
+// Reference: https://ionicframework.com/docs/theming/basics
+$pearl: map.get(t.$colors, 'pearl');
+$midnight: map.get(t.$colors, 'midnight');
+$mint: map.get(t.$colors, 'mint');
+
+:root {
+  color-scheme: light;
+
+  --ion-font-family: #{t.$font-family};
+  --ion-background-color: #{$pearl};
+  --ion-text-color: #{$midnight};
+
+  --ion-color-primary: #{$midnight};
+  --ion-color-primary-rgb: 15, 23, 42;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #0d1528;
+  --ion-color-primary-tint: #26324a;
+
+  --ion-color-success: #{$mint};
+  --ion-color-success-rgb: 16, 185, 129;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+}
+
+ion-app {
+  background: #{$pearl};
+}

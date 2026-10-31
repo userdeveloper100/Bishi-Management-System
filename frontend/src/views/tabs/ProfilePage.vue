@@ -1,10 +1,10 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="bg-pearl">
-      <div class="mx-auto max-w-[400px] px-5 pb-40 pt-[max(1.5rem,env(safe-area-inset-top))]">
+      <div class="mx-auto max-w-400 px-5 pb-40 pt-safe">
         <AppHeader />
 
-        <h1 class="mt-8 text-[30px] font-semibold tracking-tight text-midnight">{{ $t('profile.title') }}</h1>
+        <h1 class="mt-8 fs-30 fw-semibold tracking-tight text-midnight">{{ $t('profile.title') }}</h1>
 
         <div v-if="profile.profile" class="mt-6 space-y-6">
           <ProfileCard :name="profile.profile.name" :phone="profile.profile.phone" @edit="editOpen = true" />
@@ -16,7 +16,7 @@
 
           <button
             type="button"
-            class="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-[15px] font-medium text-slate-700"
+            class="d-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 fs-15 fw-medium text-slate-700"
             @click="onLogout"
           >
             <ion-icon name="log-out-outline" aria-hidden="true" />
@@ -24,10 +24,10 @@
           </button>
         </div>
 
-        <p v-else-if="profile.error" role="alert" class="mt-8 text-center text-[14px] text-red-600">
+        <p v-else-if="profile.error" role="alert" class="mt-8 text-center fs-14 text-red-600">
           {{ profile.error }}
         </p>
-        <p v-else class="mt-10 text-center text-[14px] text-slate-500">{{ $t('profile.loading') }}</p>
+        <p v-else class="mt-10 text-center fs-14 text-slate-500">{{ $t('profile.loading') }}</p>
       </div>
 
       <InfoModal
@@ -43,8 +43,8 @@
           <li>{{ $t('pro.benefit2') }}</li>
           <li>{{ $t('pro.benefit3') }}</li>
         </ul>
-        <p class="mt-4 font-semibold text-midnight">{{ $t('pro.price') }}</p>
-        <p class="mt-1 text-[14px] text-slate-500">{{ $t('pro.notAvailable') }}</p>
+        <p class="mt-4 fw-semibold text-midnight">{{ $t('pro.price') }}</p>
+        <p class="mt-1 fs-14 text-slate-500">{{ $t('pro.notAvailable') }}</p>
       </InfoModal>
 
       <InfoModal
@@ -54,21 +54,21 @@
         icon="pencil-outline"
         @close="editOpen = false"
       >
-        <dl v-if="profile.profile" class="divide-y divide-slate-200 rounded-2xl bg-white px-4">
-          <div class="flex justify-between gap-4 py-3">
+        <dl v-if="profile.profile" class="divide-y rounded-2xl bg-white px-4">
+          <div class="d-flex justify-between gap-4 py-3">
             <dt class="text-slate-500">{{ $t('profile.name') }}</dt>
-            <dd class="truncate font-medium text-midnight">{{ profile.profile.name }}</dd>
+            <dd class="truncate fw-medium text-midnight">{{ profile.profile.name }}</dd>
           </div>
-          <div class="flex justify-between gap-4 py-3">
+          <div class="d-flex justify-between gap-4 py-3">
             <dt class="text-slate-500">{{ $t('profile.email') }}</dt>
-            <dd class="truncate font-medium text-midnight">{{ profile.profile.email ?? $t('profile.notAdded') }}</dd>
+            <dd class="truncate fw-medium text-midnight">{{ profile.profile.email ?? $t('profile.notAdded') }}</dd>
           </div>
-          <div class="flex justify-between gap-4 py-3">
+          <div class="d-flex justify-between gap-4 py-3">
             <dt class="text-slate-500">{{ $t('profile.upi') }}</dt>
-            <dd class="truncate font-medium text-midnight">{{ profile.profile.upiId ?? $t('profile.notSet') }}</dd>
+            <dd class="truncate fw-medium text-midnight">{{ profile.profile.upiId ?? $t('profile.notSet') }}</dd>
           </div>
         </dl>
-        <p class="mt-4 text-[14px] text-slate-500">{{ $t('profile.editBody') }}</p>
+        <p class="mt-4 fs-14 text-slate-500">{{ $t('profile.editBody') }}</p>
       </InfoModal>
 
       <InfoModal
@@ -79,27 +79,27 @@
         :close-label="$t('common.cancel')"
         @close="closeLanguagePicker"
       >
-        <ul class="space-y-2">
+        <ul class="space-y-2 scroll-list">
           <li v-for="option in LANGUAGE_OPTIONS" :key="option.code">
             <button
               type="button"
-              class="flex w-full items-center justify-between rounded-2xl border bg-white px-4 py-3 text-left"
+              class="d-flex w-full items-center justify-between rounded-2xl border bg-white px-4 py-3 text-left"
               :class="option.code === currentLanguage ? 'border-mint' : 'border-slate-200'"
               :aria-pressed="option.code === currentLanguage"
               :disabled="profile.savingLanguage"
               @click="chooseLanguage(option.code)"
             >
-              <span class="font-medium text-midnight">{{ option.name }}</span>
+              <span class="fw-medium text-midnight">{{ option.name }}</span>
               <ion-icon
                 v-if="option.code === currentLanguage"
                 name="checkmark-circle"
-                class="text-[20px] text-mint"
+                class="fs-20 text-mint"
                 aria-hidden="true"
               />
             </button>
           </li>
         </ul>
-        <p v-if="profile.languageError" role="alert" class="mt-3 text-[14px] text-red-600">
+        <p v-if="profile.languageError" role="alert" class="mt-3 fs-14 text-red-600">
           {{ profile.languageError }}
         </p>
       </InfoModal>
@@ -118,7 +118,7 @@ import InfoModal from '@/components/InfoModal.vue';
 import ProBanner from '@/components/ProBanner.vue';
 import ProfileCard from '@/components/ProfileCard.vue';
 import SettingsList, { type SettingsRow } from '@/components/SettingsList.vue';
-import { type AppLocale } from '@/i18n';
+import { type AppLocale, isAppLocale } from '@/i18n';
 import { useAuthStore } from '@/stores/auth';
 import { useProfileStore } from '@/stores/profile';
 
@@ -127,20 +127,27 @@ const profile = useProfileStore();
 const router = useRouter();
 const { t } = useI18n();
 
-// Native names stay the same in every language, so they are listed once here.
+// Native names stay the same in every language, so they are listed once here, in picker order.
 const LANGUAGE_OPTIONS: { code: AppLocale; name: string }[] = [
   { code: 'en', name: 'English' },
   { code: 'hi', name: 'हिन्दी' },
   { code: 'mr', name: 'मराठी' },
+  { code: 'ta', name: 'தமிழ்' },
+  { code: 'te', name: 'తెలుగు' },
+  { code: 'kn', name: 'ಕನ್ನಡ' },
+  { code: 'bn', name: 'বাংলা' },
+  { code: 'pa', name: 'ਪੰਜਾਬੀ' },
+  { code: 'gu', name: 'ગુજરાતી' },
+  { code: 'mwr', name: 'मारवाड़ी' },
 ];
 
-const LANGUAGE_NAMES: Record<string, string> = Object.fromEntries(
+const LANGUAGE_NAMES: Record<AppLocale, string> = Object.fromEntries(
   LANGUAGE_OPTIONS.map((option) => [option.code, option.name]),
-);
+) as Record<AppLocale, string>;
 
 const currentLanguage = computed<AppLocale>(() => {
   const code = profile.profile?.language;
-  return code === 'hi' || code === 'mr' ? code : 'en';
+  return isAppLocale(code) ? code : 'en';
 });
 
 const accountRows = computed<SettingsRow[]>(() => {

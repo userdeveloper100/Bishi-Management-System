@@ -25,6 +25,12 @@ const routes: RouteRecordRaw[] = [
     meta: { public: true, requiresPendingPhone: true },
   },
   {
+    // Group admins: pending dues and manual payment marking. Signed-in users only, like the tabs.
+    path: '/admin/groups/:groupId/dues',
+    name: 'GroupDues',
+    component: () => import('../views/admin/DuesPage.vue'),
+  },
+  {
     path: '/tabs/',
     component: TabsPage,
     children: [

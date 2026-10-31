@@ -3,13 +3,22 @@ import type { AlertItem } from '@/services/api.service';
 const INDIAN_MOBILE = /^[6-9]\d{9}$/;
 
 /**
+ * Local test numbers for development sign-in (the seeded admin and member accounts).
+ * They are not real mobile numbers. The backend accepts them only while local test mode is on,
+ * so it is safe to allow them here.
+ */
+export const DUMMY_LOGIN_PHONES: readonly string[] = ['+911234567890', '+911234567891'];
+
+/**
  * Normalises an Indian mobile number to E.164 (+91XXXXXXXXXX).
  * Accepts 10 digits, or the same with a +91 or 91 prefix. Returns null if invalid.
  */
 export function toE164(input: string): string | null {
   const digits = input.replace(/\D/g, '');
   const national = digits.length === 12 && digits.startsWith('91') ? digits.slice(2) : digits;
-  return INDIAN_MOBILE.test(national) ? `+91${national}` : null;
+  const e164 = `+91${national}`;
+  if (DUMMY_LOGIN_PHONES.includes(e164)) return e164;
+  return INDIAN_MOBILE.test(national) ? e164 : null;
 }
 
 /** "+919876544821" -> "+91 •••••• 4821" */

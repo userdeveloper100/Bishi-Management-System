@@ -3,10 +3,10 @@
  * Returns undefined when nothing was thrown.
  */
 export function statusOf(fn: () => unknown): number | undefined {
-    try {
-        fn();
-        return undefined;
-    } catch (err) {
-        return (err as { status?: number }).status;
-    }
+  try {
+    fn();
+    return undefined;
+  } catch (err) {
+    return (err as { status?: number }).status;
+  }
 }

@@ -2,7 +2,6 @@ import { Router } from "express";
 import { userController } from "../controllers/users.controller";
 import { authMiddleware, authorizeRoles } from "../middlewares/auth";
 
-
 const router = Router();
 
 /**
@@ -103,7 +102,12 @@ router.get("/", authMiddleware, userController.getAll);
  *       404:
  *         description: User not found
  */
-router.get("/:id", authMiddleware, authorizeRoles("admin"), userController.getById);
+router.get(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("admin", "super_admin"),
+  userController.getById,
+);
 
 /**
  * @swagger
@@ -127,7 +131,12 @@ router.get("/:id", authMiddleware, authorizeRoles("admin"), userController.getBy
  *       400:
  *         description: Invalid input
  */
-router.post("/", authMiddleware, authorizeRoles("admin"), userController.create);
+router.post(
+  "/",
+  authMiddleware,
+  authorizeRoles("admin", "super_admin"),
+  userController.create,
+);
 
 /**
  * @swagger
@@ -154,7 +163,12 @@ router.post("/", authMiddleware, authorizeRoles("admin"), userController.create)
  *       404:
  *         description: User not found
  */
-router.put("/:id", authMiddleware, authorizeRoles("admin"), userController.update);
+router.put(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("admin", "super_admin"),
+  userController.update,
+);
 
 /**
  * @swagger
@@ -175,6 +189,11 @@ router.put("/:id", authMiddleware, authorizeRoles("admin"), userController.updat
  *       404:
  *         description: User not found
  */
-router.delete("/:id", authMiddleware, authorizeRoles("admin"), userController.remove);
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("admin", "super_admin"),
+  userController.remove,
+);
 
 export default router;

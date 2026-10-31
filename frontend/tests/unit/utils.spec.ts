@@ -88,3 +88,20 @@ describe('groupAlertsByDay', () => {
     expect(groupAlertsByDay([], now)).toEqual([]);
   });
 });
+
+describe('toE164 with the local dummy number', () => {
+  test('accepts +911234567890 so the development sign-in can submit it', () => {
+    expect(toE164('1234567890')).toBe('+911234567890');
+    expect(toE164('+91 1234567890')).toBe('+911234567890');
+  });
+
+  test('still rejects other numbers that start with 1', () => {
+    expect(toE164('1234567892')).toBeNull();
+  });
+});
+
+describe('toE164 with the seeded member number', () => {
+  test('accepts +911234567891 for local sign-in', () => {
+    expect(toE164('1234567891')).toBe('+911234567891');
+  });
+});

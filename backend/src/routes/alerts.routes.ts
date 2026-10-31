@@ -35,9 +35,9 @@ const router = Router();
  *         description: Missing or invalid token
  */
 router.get("/", async (req: AuthRequest, res: Response) => {
-    const category = parseCategory(req.query.category);
-    const data = await alertService.getFeed(req.user.userId, category);
-    res.json({ success: true, data });
+  const category = parseCategory(req.query.category);
+  const data = await alertService.getFeed(req.user.userId, category);
+  res.json({ success: true, data });
 });
 
 export default router;

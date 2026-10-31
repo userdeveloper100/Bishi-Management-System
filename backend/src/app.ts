@@ -18,24 +18,23 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 // ---------- Routes ----------
 app.use("/api", routes);
 
-
 // Swagger docs
 swaggerDocs(app as any);
 
 // ---------- Health Check ----------
 app.get("/", (req: Request, res: Response) => {
-    res.status(200).json({
-        success: true,
-        message: "Bishi API is running 🚀",
-    });
+  res.status(200).json({
+    success: true,
+    message: "Bishi API is running 🚀",
+  });
 });
 
 // ---------- 404 Handler ----------
 app.use((req: Request, res: Response) => {
-    res.status(404).json({
-        success: false,
-        message: "Route not found",
-    });
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
 });
 
 // ---------- Global Error Handler ----------

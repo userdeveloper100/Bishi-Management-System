@@ -1,0 +1,142 @@
+// Design tokens. Every colour, size, radius and shadow used by the app is defined here.
+// Change a value once and every utility and component picks it up.
+
+// Brand palette (luxury fintech).
+$colors: (
+  'pearl': #f8fafc,
+  'midnight': #0f172a,
+  'champagne': #c5a059,
+  'champagne-light': #e5c585,
+  // Darker gold for text on light gold tints (contrast on white).
+  'champagne-dark': #8a6a2f,
+  'mint': #10b981,
+  'white': #ffffff,
+  'slate-100': #f1f5f9,
+  'slate-200': #e2e8f0,
+  'slate-300': #cbd5e1,
+  'slate-400': #94a3b8,
+  'slate-500': #64748b,
+  'slate-600': #475569,
+  'slate-700': #334155,
+  'red-300': #fca5a5,
+  'red-600': #dc2626,
+);
+
+// Colours at a fraction of their strength: bg-champagne-light-35, border-white-70 and so on.
+$tints: (
+  'champagne-light': (
+    35,
+    40,
+  ),
+  'champagne': (
+    10,
+    20,
+    30,
+    50,
+    70,
+  ),
+  'mint': (10),
+  'white': (
+    70,
+    75,
+  ),
+);
+
+// Spacing scale, used for padding, margin, gap, width and height. Key 1 is 4px.
+$space: (
+  '0': 0,
+  '0-5': 2px,
+  '1': 4px,
+  '1-5': 6px,
+  '2': 8px,
+  '2-5': 10px,
+  '3': 12px,
+  '3-5': 14px,
+  '4': 16px,
+  '5': 20px,
+  '6': 24px,
+  '7': 28px,
+  '8': 32px,
+  '9': 36px,
+  '10': 40px,
+  '11': 44px,
+  '12': 48px,
+  '14': 56px,
+  '16': 64px,
+  '20': 80px,
+  '24': 96px,
+  '28': 112px,
+  '32': 128px,
+  '40': 160px,
+  '60': 240px,
+);
+
+$radii: (
+  'md': 6px,
+  'xl': 12px,
+  '2xl': 16px,
+  '3xl': 24px,
+  'hero': 28px,
+  'full': 9999px,
+);
+
+$shadows: (
+  'sm': 0 1px 2px rgba(15, 23, 42, 0.04),
+  'soft': 0 8px 24px rgba(15, 23, 42, 0.04),
+  'card': 0 8px 24px rgba(15, 23, 42, 0.06),
+  'lift': 0 16px 40px rgba(15, 23, 42, 0.18),
+  'tile': 0 16px 40px rgba(15, 23, 42, 0.25),
+  'cta': 0 12px 28px rgba(15, 23, 42, 0.22),
+  'fab': 0 12px 28px rgba(15, 23, 42, 0.3),
+  'glass': 0 12px 40px rgba(15, 23, 42, 0.12),
+);
+
+$font-family:
+  'Inter',
+  ui-sans-serif,
+  system-ui,
+  -apple-system,
+  'Segoe UI',
+  sans-serif;
+
+$font-sizes: (
+  '11': 11px,
+  '12': 12px,
+  '13': 13px,
+  '14': 14px,
+  '15': 15px,
+  '16': 16px,
+  '17': 17px,
+  '18': 18px,
+  '20': 20px,
+  '22': 22px,
+  '26': 26px,
+  '30': 30px,
+  '32': 32px,
+  '34': 34px,
+  '40': 40px,
+);
+
+$font-weights: (
+  'regular': 400,
+  'medium': 500,
+  'semibold': 600,
+  'bold': 700,
+);
+
+$letter-spacings: (
+  'tight': -0.025em,
+  'wide': 0.025em,
+  '12': 0.12em,
+  '14': 0.14em,
+  '20': 0.2em,
+);
+
+$max-widths: (
+  '400': 400px,
+);
+
+$z-indexes: (
+  '40': 40,
+  '50': 50,
+);

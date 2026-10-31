@@ -1,0 +1,22 @@
+@use 'sass:map';
+@use 'tokens' as t;
+
+// Minimal base. Preflight is not used because Ionic ships its own base styles.
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: t.$font-family;
+  color: map.get(t.$colors, 'midnight');
+  background: map.get(t.$colors, 'pearl');
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
