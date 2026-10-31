@@ -12,7 +12,7 @@ model User {
   name          String
   email         String?   @unique
   password      String?
-  phone         String?   @unique
+  phone         String    @unique
   phoneVerified Boolean   @default(false)
   upiId         String?
   language      String    @default("en")

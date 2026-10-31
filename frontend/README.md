@@ -19,7 +19,9 @@ It talks to the [backend](../backend/README.md) REST API. The monorepo overview 
 ### Done
 
 - **Sign-in:** phone entry with the +91 prefix and validation. OTP entry uses six boxes, supports paste, has a 30-second resend cooldown, and offers a change-number path.
-- **Routing:** `/login`, `/otp`, `/tabs/groups|alerts|loan|profile`, and `/admin/groups/:groupId/dues`. Signed-out users are sent to login. Signed-in users are kept out of the sign-in screens.
+- **Routing:** `/login`, `/otp`, `/tabs/groups|alerts|loan|profile`, `/admin/groups/:groupId/dues`, and the Super Admin screens at `/admin/super-admin` and `/admin/super-admin/:resource`. Signed-out users are sent to login. Signed-in users are kept out of the sign-in screens. Routes marked for a role (the Super Admin screens) send any other user back to the groups tab.
+- **Master settings (Super Admin):** one config-driven screen for users, roles, permissions, role permissions, groups, bishis, transactions, and audit logs. It has a list, a create and edit form, and a delete confirmation. Transactions and audit logs are read-only. The index is reached from **Profile → Master settings**, which only Super Admins see.
+- **Phone entry:** the sign-in and admin screens accept any ten-digit number that does not start with 0. The backend decides whether the number has an account.
 - **Groups screen:** greeting, savings hero card, group cards, and loading, empty, and error states.
 - **Dues screen:** pending and paid lists, the pending total, create-this-month dues, and a Cash or UPI confirmation before a payment is recorded.
 - **Alerts screen:** filters, day grouping, unread count, and polling while visible.
@@ -28,7 +30,7 @@ It talks to the [backend](../backend/README.md) REST API. The monorepo overview 
 - **Styling:** an SCSS utility system built from design tokens. No Tailwind and no inline styles.
 - **API layer:** one Axios client in `src/services/api.service.ts`, with typed calls, a bearer-token interceptor, and readable error messages.
 - **State (Pinia):** stores for `auth`, `groups`, `alerts` (with polling), `profile`, and the language change with rollback on failure.
-- **Tests:** 92 unit tests across 12 files, and two Playwright browser tests (the sign-in redirect and the local dummy login).
+- **Tests:** Vitest unit tests for the components, pages, stores, API client, utilities, locales, and the Super Admin configuration and payload rules. Two Playwright browser tests (the sign-in redirect and the local dummy login). Run `npx vitest run` for the current count.
 
 ### In progress
 
@@ -41,7 +43,6 @@ It talks to the [backend](../backend/README.md) REST API. The monorepo overview 
 - **Pro subscription purchase:** the Get Pro banner opens a dialog with the plan details. Purchasing is not connected.
 - **Profile editing:** the Edit action shows the current details. Saving needs a profile update endpoint for name, email, and UPI.
 - **Member payments:** members cannot pay through the app. The dues screen is for admins only.
-- **Super Admin screens:** the Super Admin role works on the backend, but there is no screen for it yet.
 - **Visual QA:** the screens were built from the reference designs, but they have not been compared pixel by pixel in a browser.
 - **Real-time updates:** alerts poll every 30 seconds. Push delivery (WebSocket or FCM) is not built.
 - **Native builds:** Capacitor is installed, but there are no `android/` or `ios/` projects yet.
@@ -86,8 +87,10 @@ frontend/
 │   ├── stores/          # Pinia stores: auth, groups, alerts, profile
 │   ├── styles/          # SCSS: _tokens, _mixins, _base, _utilities, _components, main.scss
 │   ├── theme/           # ionic.scss (Ionic theme variables built from the tokens)
-│   ├── utils/           # format.ts (phone, currency, time, bid time, alert days, dummy numbers)
-│   ├── views/           # LoginPage, OtpPage, tabs/ (Groups, Alerts, Loan, Profile), admin/DuesPage
+│   ├── utils/           # format.ts (phone, currency, time, bid time, alert days),
+│   │                    #   superAdminResources.ts (Super Admin screen config and the request-body rules)
+│   ├── views/           # LoginPage, OtpPage, tabs/ (Groups, Alerts, Loan, Profile),
+│   │                    #   admin/DuesPage, admin/SuperAdminIndexPage, admin/SuperAdminResourcePage
 │   ├── App.vue
 │   └── main.ts          # App setup: Ionic, Pinia, router, i18n, styles
 ├── scripts/
@@ -228,7 +231,8 @@ Unit tests live in `tests/unit/`. They use Vitest, Vue Test Utils, and `vi.mock`
 | `alerts.store.spec.ts` | Filtering, error handling, polling start and stop |
 | `profile.store.spec.ts` | Language switch applied at once, saved, and reverted on failure |
 | `api.service.spec.ts` | Endpoints and parameters, bearer header, error messages (Axios mocked) |
-| `utils.spec.ts` | Phone, currency, time, bid-time, alert-day helpers, and the seeded numbers |
+| `utils.spec.ts` | Phone, currency, time, bid-time, alert-day helpers |
+| `superAdminResources.spec.ts` | Super Admin screen configuration (read-only views, role-permission rules) and the request-body rules (required fields, numbers, edit behaviour) |
 | `locales.spec.ts` | Every locale has the English keys, the same placeholders, and no empty messages |
 
 `jsdom` is pinned to 26.x. Newer versions need Node 22.22 or later.
@@ -242,7 +246,7 @@ Playwright uses the `Mobile Chrome` device profile. Run `npx playwright install 
 ## Known limitations
 
 - The access token is stored in `localStorage`. This is fine for the browser build, but not for a store release.
-- Admin and member screens are separate. There is no Super Admin screen.
+- Admin and member screens are separate. The Super Admin screens use English text only, and they have not been checked on a device.
 - The dues screen records payments, but the app does not confirm them with a bank or UPI provider. The admin's entry is the record.
 
 ## Author

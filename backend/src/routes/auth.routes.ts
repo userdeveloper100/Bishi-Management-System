@@ -19,6 +19,7 @@ const router = Router();
  *       required:
  *         - name
  *         - email
+ *         - phone
  *         - password
  *       properties:
  *         name:
@@ -28,6 +29,10 @@ const router = Router();
  *           type: string
  *           format: email
  *           example: "shailendra@example.com"
+ *         phone:
+ *           type: string
+ *           description: Unique ten-digit Indian mobile number. Required for every account.
+ *           example: "+919876543210"
  *         password:
  *           type: string
  *           format: password
@@ -75,7 +80,9 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/AuthResponse'
  *       400:
- *         description: Invalid input or user already exists
+ *         description: Invalid input, including a missing or malformed phone number
+ *       409:
+ *         description: An account with this email or phone number already exists
  */
 router.post("/register", authController.register);
 

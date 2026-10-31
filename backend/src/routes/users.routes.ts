@@ -23,6 +23,7 @@ const router = Router();
  *         - id
  *         - name
  *         - email
+ *         - phone
  *         - password
  *       properties:
  *         id:

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { userService } from "../services/user.service";
 import { notFound } from "../utils/httpError";
+import { normalizePhone } from "../utils/phone";
 import {
   optionalString,
   requireEmail,
@@ -23,6 +24,7 @@ export const userController = {
     const user = await userService.create({
       name: requireString(body.name, "name"),
       email: requireEmail(body.email, "email"),
+      phone: normalizePhone(body.phone),
       password: requireString(body.password, "password"),
       roleId: optionalString(body.roleId, "roleId"),
     });

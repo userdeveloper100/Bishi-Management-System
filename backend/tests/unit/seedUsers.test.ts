@@ -1,4 +1,9 @@
-import { seedDefaultPhoneUsers, DEFAULT_PHONE_USERS, SEED_SUPER_ADMIN_PHONE } from "../../prisma/seedUsers";
+import {
+  seedDefaultPhoneUsers,
+  DEFAULT_PHONE_USERS,
+  SEED_EMAIL_ADMIN_PHONE,
+  SEED_SUPER_ADMIN_PHONE,
+} from "../../prisma/seedUsers";
 import { normalizePhone } from "../../src/utils/phone";
 
 describe("default phone users", () => {
@@ -33,5 +38,16 @@ describe("seeded phone numbers", () => {
   it("are valid input, so the seeded accounts can be looked up at sign-in", () => {
     expect(normalizePhone("1234567891")).toBe("+911234567891");
     expect(normalizePhone(SEED_SUPER_ADMIN_PHONE)).toBe("+911234567892");
+  });
+
+  it("give every seeded account a valid phone, and no two accounts share one", () => {
+    const seeded = [
+      ...DEFAULT_PHONE_USERS.map((u) => u.phone),
+      SEED_SUPER_ADMIN_PHONE,
+      SEED_EMAIL_ADMIN_PHONE,
+    ];
+
+    seeded.forEach((phone) => expect(normalizePhone(phone)).toBe(phone));
+    expect(new Set(seeded).size).toBe(seeded.length);
   });
 });

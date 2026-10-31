@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { SEED_SUPER_ADMIN_PHONE, seedDefaultPhoneUsers } from "./seedUsers";
+import { SEED_EMAIL_ADMIN_PHONE, SEED_SUPER_ADMIN_PHONE, seedDefaultPhoneUsers } from "./seedUsers";
 
 const prisma = new PrismaClient();
 
@@ -86,12 +86,14 @@ async function main(): Promise<void> {
         update: {
             name: "Admin User",
             password: adminPasswordHash,
+            phone: SEED_EMAIL_ADMIN_PHONE,
             roleId: adminRole.id,
         },
         create: {
             name: "Admin User",
             email: "admin@admin.com",
             password: adminPasswordHash,
+            phone: SEED_EMAIL_ADMIN_PHONE,
             roleId: adminRole.id,
         },
     });

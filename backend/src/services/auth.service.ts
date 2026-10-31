@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import { prisma } from "../prismaClient";
 import { HttpError } from "../utils/httpError";
+import { normalizePhone } from "../utils/phone";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const BCRYPT_SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS || 10);
@@ -41,8 +42,11 @@ export const authService = {
     name: string,
     email: string,
     password: string,
+    phone: unknown,
     roleName = "user",
   ) {
+    // Every user has a phone number, so it is required and must be a valid number.
+    const normalizedPhone = normalizePhone(phone);
     const hashed = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
     // 🔑 Find role by name (default "user")
@@ -51,23 +55,31 @@ export const authService = {
       throw new Error(`Role "${roleName}" not found in database`);
     }
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashed,
-        roleId: role.id,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        created_date: true,
-        role: { select: { name: true } },
-      },
-    });
-
-    return user;
+    try {
+      return await prisma.user.create({
+        data: {
+          name,
+          email,
+          phone: normalizedPhone,
+          password: hashed,
+          roleId: role.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          created_date: true,
+          role: { select: { name: true } },
+        },
+      });
+    } catch (err: any) {
+      // P2002 is the unique-constraint violation for an email or phone that is already taken.
+      if (err?.code === "P2002") {
+        throw new HttpError(409, "An account with this email or phone number already exists");
+      }
+      throw err;
+    }
   },
 
   /**

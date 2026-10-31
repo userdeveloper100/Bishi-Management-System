@@ -5,11 +5,11 @@ import { otpService } from "../services/otp.service";
 export const authController = {
   async register(req: Request, res: Response) {
     try {
-      const { name, email, password } = req.body;
-      const newUser = await authService.register(name, email, password);
+      const { name, email, password, phone } = req.body;
+      const newUser = await authService.register(name, email, password, phone);
       res.status(201).json(newUser);
     } catch (err: any) {
-      res.status(400).json({ message: err.message });
+      res.status(err.status ?? 400).json({ message: err.message });
     }
   },
 

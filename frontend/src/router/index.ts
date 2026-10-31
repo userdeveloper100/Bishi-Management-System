@@ -31,6 +31,19 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/admin/DuesPage.vue'),
   },
   {
+    // Master settings for Super Admins. The guard below sends everyone else back to the groups tab.
+    path: '/admin/super-admin',
+    name: 'SuperAdmin',
+    component: () => import('../views/admin/SuperAdminIndexPage.vue'),
+    meta: { requiresRole: 'super_admin' },
+  },
+  {
+    path: '/admin/super-admin/:resource',
+    name: 'SuperAdminResource',
+    component: () => import('../views/admin/SuperAdminResourcePage.vue'),
+    meta: { requiresRole: 'super_admin' },
+  },
+  {
     path: '/tabs/',
     component: TabsPage,
     children: [
@@ -57,6 +70,10 @@ router.beforeEach((to) => {
   // Everything except login and OTP requires a signed-in user.
   if (!to.meta.public && !auth.isAuthenticated) {
     return { path: '/login', replace: true };
+  }
+  // Screens for one role only. The role comes from the signed-in user, which the backend also checks.
+  if (to.meta.requiresRole && auth.user?.role !== to.meta.requiresRole) {
+    return { path: '/tabs/groups', replace: true };
   }
   // Signed-in users never need the sign-in screens again.
   if (to.meta.public && to.path === '/login' && auth.isAuthenticated) {

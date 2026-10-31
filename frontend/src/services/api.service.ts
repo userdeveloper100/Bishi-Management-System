@@ -186,6 +186,42 @@ export async function markDuePaid(id: string, method: PaymentMethod): Promise<Du
   return data.data;
 }
 
+/* ---------- Super Admin master settings (raw JSON, no envelope) ---------- */
+
+export type SuperAdminResource =
+  | 'users'
+  | 'roles'
+  | 'permissions'
+  | 'role-permissions'
+  | 'groups'
+  | 'bishis'
+  | 'transactions'
+  | 'audit-logs';
+
+/** Rows come back as plain objects; each screen reads only the fields it shows. */
+export type SuperAdminRow = Record<string, any>;
+
+export async function listSuperAdmin(resource: SuperAdminResource): Promise<SuperAdminRow[]> {
+  const { data } = await http.get<SuperAdminRow[]>(`/super-admin/${resource}`);
+  return data;
+}
+
+export async function createSuperAdmin(resource: SuperAdminResource, body: Record<string, unknown>): Promise<void> {
+  await http.post(`/super-admin/${resource}`, body);
+}
+
+export async function updateSuperAdmin(
+  resource: SuperAdminResource,
+  id: string,
+  body: Record<string, unknown>,
+): Promise<void> {
+  await http.put(`/super-admin/${resource}/${id}`, body);
+}
+
+export async function deleteSuperAdmin(resource: SuperAdminResource, id: string): Promise<void> {
+  await http.delete(`/super-admin/${resource}/${id}`);
+}
+
 // Backend errors look like { success: false, message: "..." }.
 export function errorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {

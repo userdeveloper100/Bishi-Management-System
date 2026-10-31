@@ -14,6 +14,15 @@
           <SettingsList :title="$t('profile.accountTitle')" :rows="accountRows" @select="onSelect" />
           <SettingsList :title="$t('profile.settingsTitle')" :rows="communityRows" @select="onSelect" />
 
+          <router-link
+            v-if="auth.user?.role === 'super_admin'"
+            to="/admin/super-admin"
+            class="d-flex w-full items-center justify-center gap-2 rounded-2xl bg-midnight px-5 py-4 fs-15 fw-semibold text-white"
+          >
+            <ion-icon name="shield-checkmark-outline" aria-hidden="true" />
+            Master settings
+          </router-link>
+
           <button
             type="button"
             class="d-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 fs-15 fw-medium text-slate-700"

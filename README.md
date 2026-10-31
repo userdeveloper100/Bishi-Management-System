@@ -72,11 +72,28 @@ There are three tiers. The role lives on the user (`Role` table) and is carried 
 
 | Tier | Role | What it can do |
 | --- | --- | --- |
-| Super Admin | `super_admin` | Platform owner. Sees every group, can manage dues for any group, and is the only role that can use the master user routes (`/api/users`). Seeded locally as `superadmin@admin.com` / `superadmin@123`, phone `+91 1234567892`. |
+| Super Admin | `super_admin` | Platform owner. Sees every group, can manage dues for any group, and is the only role that can use the master settings (`/api/users` and `/api/super-admin`). Seeded locally as `superadmin@admin.com` / `superadmin@123`, phone `+91 1234567892`. |
 | Admin (group organizer) | Member of a group with `Membership.role = "admin"` | Creates the group's dues, lists them, and marks payments as paid. Sees the groups they belong to. |
 | Member | `user` | Sees only the groups they belong to, and their own dues. Cannot create dues or mark payments. |
 
 The platform `admin` role no longer reaches the user routes (`/api/users`); those return 403. It keeps its access to the full group list and to deletes, as a legacy role. Move those checks to `super_admin` when you are ready.
+
+## Master settings (Super Admin)
+
+Super Admins manage platform-wide data from the app. Sign in as a Super Admin, open **Profile**, and tap **Master settings**. The screens are at `/admin/super-admin`.
+
+| Screen | What it does |
+| --- | --- |
+| Users | Create, edit, and delete users. Assign a role. A phone number is required and must be unique. |
+| Roles | Create, rename, and delete roles. A role that users still hold cannot be deleted. |
+| Permissions | Create, rename, and delete permissions. |
+| Role permissions | Give a permission to a role, or take it away. |
+| Groups | Create, edit, and delete groups. A group with dues or payments recorded cannot be deleted. |
+| Bishis | Create, edit, and delete rounds across groups. |
+| Transactions | Read-only list across groups. |
+| Audit logs | Read-only trail of every change, newest first. |
+
+Every change is recorded in the audit log with the Super Admin who made it. The API is under `/api/super-admin` (see [backend/README.md](backend/README.md#master-settings-super-admin)). Anyone else who opens these screens is sent back to the groups tab, and the API returns 403.
 
 ## Dues and manual payments
 
@@ -89,7 +106,7 @@ BhishiPay does not take money. Group admins record payments that members settle 
 
 API: `GET /api/contributions?groupId=`, `POST /api/contributions/generate`, `POST /api/contributions/:id/mark-paid`, and `GET /api/user/dues`.
 
-Not built yet: members paying through the app, and a Super Admin screen.
+Not built yet: members paying through the app.
 
 ## Swagger authorization
 
@@ -131,9 +148,9 @@ node scripts/check-classes.mjs "$TEMP/app.css"
 
 | Suite | Command | Count | Notes |
 | --- | --- | --- | --- |
-| Backend unit and HTTP (Jest) | `cd backend && npm run test:unit` | 166 tests in 16 suites | No database. Prisma and SMS are mocked. |
+| Backend unit and HTTP (Jest) | `cd backend && npm run test:unit` | Run for the current count | No database. Prisma and SMS are mocked. |
 | Backend end-to-end | `cd backend && npm run test:e2e` | Node test runner | Uses the database in `.env`. |
-| Frontend unit (Vitest) | `cd frontend && npx vitest run` | 92 tests in 12 files | Vue Test Utils with mocked API. |
+| Frontend unit (Vitest) | `cd frontend && npx vitest run` | Run for the current count | Vue Test Utils with mocked API. |
 | Frontend browser (Playwright) | `cd frontend && npx playwright test` | 2 tests | Needs the backend running with local OTP enabled. |
 
 To run the browser tests against a backend on another port:
@@ -170,7 +187,8 @@ cd frontend && npx vue-tsc --noEmit && npx vite build
 ## Known limitations
 
 - SMS is not delivered. The only sender writes the code to the console.
-- Members cannot pay through the app, and there is no Super Admin screen.
+- Members cannot pay through the app.
+- The Super Admin master screens use English text only. They are not yet in the other nine languages.
 - Create group, add members, Pro purchase, Loan/Ledger, and profile editing are placeholders.
 - The access token is kept in `localStorage`. Use secure storage before a store release.
 - Visual screens have not yet been compared pixel by pixel with the reference designs.

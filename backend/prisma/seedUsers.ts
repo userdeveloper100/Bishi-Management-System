@@ -6,6 +6,8 @@ import type { PrismaClient } from "@prisma/client";
 export const SEED_ADMIN_PHONE = "+911234567890";
 export const SEED_MEMBER_PHONE = "+911234567891";
 export const SEED_SUPER_ADMIN_PHONE = "+911234567892";
+/** Phone for the email-login admin (admin@admin.com). Every seeded user needs a phone, and no two may share one. */
+export const SEED_EMAIL_ADMIN_PHONE = "+911234567893";
 
 export type SeedRole = "admin" | "user";
 

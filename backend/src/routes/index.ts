@@ -12,6 +12,8 @@ import authRoutes from "./auth.routes";
 import alertRoutes from "./alerts.routes";
 import profileRoutes from "./profile.routes";
 import contributionRoutes from "./contributions.routes";
+import superAdminRoutes from "./superAdmin.routes";
+import { requireSuperAdmin } from "../middlewares/superAdmin";
 import {
   AuthRequest,
   authMiddleware,
@@ -48,5 +50,8 @@ router.use("/user", authMiddleware, profileRoutes);
 
 // Dues and manual payments. Each handler checks that the caller administers the group.
 router.use("/contributions", authMiddleware, contributionRoutes);
+
+// Master settings. The Super Admin check runs for every request under this prefix.
+router.use("/super-admin", authMiddleware, requireSuperAdmin, superAdminRoutes);
 
 export default router;
