@@ -136,6 +136,12 @@ export async function fetchProfile(): Promise<ProfileData> {
   return data.data;
 }
 
+/** The signed-in user, with the role and permissions as the database has them now. */
+export async function fetchMe(): Promise<AuthUser> {
+  const { data } = await http.get<AuthUser>('/auth/me');
+  return data;
+}
+
 export interface ProfileUpdate {
   language?: string;
 }

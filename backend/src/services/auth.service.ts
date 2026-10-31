@@ -124,6 +124,32 @@ export const authService = {
   },
 
   /**
+   * The signed-in user's identity, with the role and permissions as they are now in the database.
+   * The app calls this when it opens with a saved token, so the role is known after a reload.
+   */
+  async currentUser(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        role: { select: ROLE_SELECT },
+      },
+    });
+    if (!user) throw new HttpError(401, "Not authenticated");
+
+    const access = toAccess(user.role as RoleRow | null);
+    return {
+      id: user.id,
+      name: user.name,
+      phone: user.phone,
+      role: access.role,
+      permissions: access.permissions,
+    };
+  },
+
+  /**
    * Log in an existing user after their phone number has been verified by OTP.
    * The phone must belong to an account in the database; unknown numbers get a 404.
    * The token and response carry the role and permissions from the database.

@@ -6,6 +6,17 @@
 
         <h1 class="mt-8 fs-30 fw-semibold tracking-tight text-midnight">{{ $t('profile.title') }}</h1>
 
+        <!-- Shown from the role held in the auth store, so it does not wait for the profile to load. -->
+        <router-link
+          v-if="auth.user?.role === 'super_admin'"
+          to="/admin/super-admin"
+          class="mt-6 d-flex w-full items-center justify-center gap-2 rounded-2xl bg-midnight px-5 py-4 fs-15 fw-semibold text-white"
+          data-testid="master-settings-link"
+        >
+          <ion-icon name="shield-checkmark-outline" aria-hidden="true" />
+          Master settings
+        </router-link>
+
         <div v-if="profile.profile" class="mt-6 space-y-6">
           <ProfileCard :name="profile.profile.name" :phone="profile.profile.phone" @edit="editOpen = true" />
 
@@ -13,15 +24,6 @@
 
           <SettingsList :title="$t('profile.accountTitle')" :rows="accountRows" @select="onSelect" />
           <SettingsList :title="$t('profile.settingsTitle')" :rows="communityRows" @select="onSelect" />
-
-          <router-link
-            v-if="auth.user?.role === 'super_admin'"
-            to="/admin/super-admin"
-            class="d-flex w-full items-center justify-center gap-2 rounded-2xl bg-midnight px-5 py-4 fs-15 fw-semibold text-white"
-          >
-            <ion-icon name="shield-checkmark-outline" aria-hidden="true" />
-            Master settings
-          </router-link>
 
           <button
             type="button"
@@ -117,10 +119,9 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonPage, onIonViewWillEnter } from '@ionic/vue';
+import { IonContent, IonPage, onIonViewWillEnter, useIonRouter } from '@ionic/vue';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
 
 import AppHeader from '@/components/AppHeader.vue';
 import InfoModal from '@/components/InfoModal.vue';
@@ -133,7 +134,7 @@ import { useProfileStore } from '@/stores/profile';
 
 const auth = useAuthStore();
 const profile = useProfileStore();
-const router = useRouter();
+const ionRouter = useIonRouter();
 const { t } = useI18n();
 
 // Native names stay the same in every language, so they are listed once here, in picker order.
@@ -237,6 +238,6 @@ async function onSelect(id: string) {
 
 function onLogout() {
   auth.logout();
-  router.replace('/login');
+  ionRouter.navigate('/login', 'root', 'replace');
 }
 </script>

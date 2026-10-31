@@ -61,8 +61,12 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const auth = useAuthStore();
+
+  // A saved token is checked with the server before any sign-in or role decision. After a reload this
+  // is what loads the user's role, and it clears a token the server no longer accepts.
+  await auth.restoreSession();
 
   if (to.meta.requiresPendingPhone && !auth.pendingPhone) {
     return { path: '/login', replace: true };

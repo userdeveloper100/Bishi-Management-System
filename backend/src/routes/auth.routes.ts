@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authController } from "../controllers/auth.controller";
+import { authMiddleware } from "../middlewares/auth";
 
 const router = Router();
 
@@ -181,5 +182,21 @@ router.post("/send-otp", authController.sendOtp);
  *         description: Too many incorrect attempts
  */
 router.post("/verify-otp", authController.verifyOtp);
+
+/**
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: The signed-in user, with their role and permissions as stored in the database
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The user's identity, role, and permission names
+ *       401:
+ *         description: Missing or invalid token, or the account no longer exists
+ */
+router.get("/me", authMiddleware, authController.me);
 
 export default router;

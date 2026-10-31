@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
+import { AuthRequest } from "../middlewares/auth";
 import { authService } from "../services/auth.service";
 import { otpService } from "../services/otp.service";
+import { HttpError } from "../utils/httpError";
 
 export const authController = {
   async register(req: Request, res: Response) {
@@ -32,5 +34,12 @@ export const authController = {
     const phone = await otpService.verifyOtp(req.body?.phone, req.body?.otp);
     const result = await authService.loginWithPhone(phone);
     res.json({ success: true, token: result.token, user: result.user });
+  },
+
+  /** The signed-in user. Runs after authMiddleware, so req.user is set. */
+  async me(req: AuthRequest, res: Response) {
+    const userId = req.user?.userId;
+    if (!userId) throw new HttpError(401, "Not authenticated");
+    res.json(await authService.currentUser(userId));
   },
 };

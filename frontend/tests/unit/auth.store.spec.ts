@@ -2,13 +2,14 @@ import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import * as api from '@/services/api.service';
-import { clearSession, getToken } from '@/services/session';
+import { clearSession, getToken, setToken } from '@/services/session';
 import { useAuthStore } from '@/stores/auth';
 import { useGroupsStore } from '@/stores/groups';
 
 vi.mock('@/services/api.service', () => ({
   sendOtp: vi.fn(),
   verifyOtp: vi.fn(),
+  fetchMe: vi.fn(),
   fetchGroups: vi.fn(),
   fetchAlerts: vi.fn(),
   fetchProfile: vi.fn(),
@@ -17,6 +18,12 @@ vi.mock('@/services/api.service', () => ({
 
 const PHONE = '+919876544821';
 const user = { id: 'u1', name: 'Sp', phone: PHONE, role: 'user', permissions: [] };
+const superAdmin = { id: 's1', name: 'Super', phone: '+911234567892', role: 'super_admin', permissions: [] };
+
+/** An error shaped like an Axios error with an HTTP status. */
+function httpError(status: number) {
+  return Object.assign(new Error(`HTTP ${status}`), { isAxiosError: true, response: { status } });
+}
 
 describe('auth store', () => {
   beforeEach(() => {
@@ -93,6 +100,63 @@ describe('auth store', () => {
     expect(store.user).toBeNull();
     expect(store.pendingPhone).toBeNull();
     expect(getToken()).toBeNull();
+  });
+
+  test('a saved token loads the signed-in user, including the role, from the server', async () => {
+    setToken('saved-jwt');
+    vi.mocked(api.fetchMe).mockResolvedValue(superAdmin);
+    const store = useAuthStore();
+
+    await store.restoreSession();
+
+    expect(api.fetchMe).toHaveBeenCalledTimes(1);
+    expect(store.user?.role).toBe('super_admin');
+    expect(store.isAuthenticated).toBe(true);
+  });
+
+  test('a token the server rejects is cleared, so the sign-in screen is available again', async () => {
+    setToken('stale-jwt');
+    vi.mocked(api.fetchMe).mockRejectedValue(httpError(401));
+    const store = useAuthStore();
+
+    await store.restoreSession();
+
+    expect(store.isAuthenticated).toBe(false);
+    expect(store.user).toBeNull();
+    expect(getToken()).toBeNull();
+  });
+
+  test('a network failure keeps the token, so the next navigation can try again', async () => {
+    setToken('saved-jwt');
+    vi.mocked(api.fetchMe).mockRejectedValue(new Error('Network Error'));
+    const store = useAuthStore();
+
+    await store.restoreSession();
+
+    expect(store.isAuthenticated).toBe(true);
+    expect(store.user).toBeNull();
+    expect(getToken()).toBe('saved-jwt');
+  });
+
+  test('restoring does nothing when there is no token or the user is already loaded', async () => {
+    const store = useAuthStore();
+    await store.restoreSession();
+    expect(api.fetchMe).not.toHaveBeenCalled();
+
+    setToken('saved-jwt');
+    store.user = user;
+    await store.restoreSession();
+    expect(api.fetchMe).not.toHaveBeenCalled();
+  });
+
+  test('simultaneous restores share one request', async () => {
+    setToken('saved-jwt');
+    vi.mocked(api.fetchMe).mockResolvedValue(superAdmin);
+    const store = useAuthStore();
+
+    await Promise.all([store.restoreSession(), store.restoreSession(), store.restoreSession()]);
+
+    expect(api.fetchMe).toHaveBeenCalledTimes(1);
   });
 
   test('logout clears data loaded for the previous user', () => {

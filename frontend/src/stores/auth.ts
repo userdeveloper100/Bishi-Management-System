@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { defineStore } from 'pinia';
 
 import * as api from '@/services/api.service';
@@ -13,6 +14,9 @@ interface AuthState {
   /** E.164 number waiting for an OTP. Set after send-otp, cleared after verify. */
   pendingPhone: string | null;
 }
+
+/** One check at a time, so several navigations at startup share a single request. */
+let restoring: Promise<void> | null = null;
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
@@ -43,6 +47,29 @@ export const useAuthStore = defineStore('auth', {
       this.token = token;
       this.user = user;
       this.pendingPhone = null;
+    },
+
+    /**
+     * Load the signed-in user (with their role) from the server when the app opens with a saved token.
+     * A token the server rejects is cleared, so the sign-in screen is available again.
+     * A network failure keeps the token; the next navigation tries again.
+     */
+    restoreSession(): Promise<void> {
+      if (!this.token || this.user) return Promise.resolve();
+      if (!restoring) {
+        restoring = (async () => {
+          try {
+            this.user = await api.fetchMe();
+          } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 401) {
+              this.logout();
+            }
+          } finally {
+            restoring = null;
+          }
+        })();
+      }
+      return restoring;
     },
 
     logout(): void {

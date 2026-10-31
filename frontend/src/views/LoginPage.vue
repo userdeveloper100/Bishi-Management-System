@@ -80,10 +80,9 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonPage } from '@ionic/vue';
+import { IonContent, IonPage, useIonRouter } from '@ionic/vue';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
 
 import BhishiLogo from '@/components/BhishiLogo.vue';
 import { errorMessage } from '@/services/api.service';
@@ -91,7 +90,7 @@ import { useAuthStore } from '@/stores/auth';
 import { toE164 } from '@/utils/format';
 
 const auth = useAuthStore();
-const router = useRouter();
+const ionRouter = useIonRouter();
 const { t } = useI18n();
 
 /** Digits typed so far, without the +91 prefix. */
@@ -115,7 +114,7 @@ async function onSubmit() {
   busy.value = true;
   try {
     await auth.requestOtp(phone);
-    router.push('/otp');
+    ionRouter.navigate('/otp', 'forward', 'push');
   } catch (err) {
     error.value = errorMessage(err);
   } finally {

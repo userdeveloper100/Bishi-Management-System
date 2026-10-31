@@ -7,7 +7,7 @@
             type="button"
             class="d-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-midnight"
             :aria-label="$t('common.back')"
-            @click="router.push('/login')"
+            @click="ionRouter.navigate('/login', 'back', 'pop')"
           >
             <ion-icon name="arrow-back-outline" class="fs-20" />
           </button>
@@ -32,7 +32,7 @@
         <button
           type="button"
           class="bh-link mt-1 d-inline-flex w-fit items-center gap-1-5 fs-14"
-          @click="router.push('/login')"
+          @click="ionRouter.navigate('/login', 'back', 'pop')"
         >
           {{ $t('otp.change') }}
           <ion-icon name="pencil-outline" class="fs-14" aria-hidden="true" />
@@ -71,9 +71,8 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonPage } from '@ionic/vue';
+import { IonContent, IonPage, useIonRouter } from '@ionic/vue';
 import { computed, onUnmounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
 
 import OtpBoxes from '@/components/OtpBoxes.vue';
 import { errorMessage } from '@/services/api.service';
@@ -83,7 +82,8 @@ import { maskPhone } from '@/utils/format';
 const DEFAULT_RESEND_SECONDS = 30;
 
 const auth = useAuthStore();
-const router = useRouter();
+// Ionic's own navigation. vue-router's push/replace can leave the previous page on screen inside ion-router-outlet.
+const ionRouter = useIonRouter();
 
 const code = ref('');
 const error = ref('');
@@ -118,7 +118,7 @@ async function onVerify() {
   busy.value = true;
   try {
     await auth.verifyOtp(code.value);
-    router.replace('/tabs/groups');
+    ionRouter.navigate('/tabs/groups', 'root', 'replace');
   } catch (err) {
     error.value = errorMessage(err);
     code.value = '';
