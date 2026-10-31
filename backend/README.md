@@ -76,7 +76,7 @@ Rules:
 backend/
 ├── prisma/
 │   ├── schema.prisma        # Data models (User, Role, Permission, Group, Membership, Contribution, AuditLog, ...)
-│   ├── migrations/          # Tracked migration history (apply with prisma migrate deploy)
+│   ├── migrations/          # Local migration history, git-ignored (create with prisma migrate dev)
 │   ├── seed.ts              # Roles, permissions, and default accounts
 │   └── seedUsers.ts         # Default phone-login users (admin and member)
 ├── src/
@@ -144,7 +144,7 @@ Never set `NODE_ENV=development` or `USE_LOCAL_OTP=true` on a server that serves
 
 ```bash
 npm run prisma:generate
-npx prisma migrate deploy     # applies the committed migrations to DATABASE_URL
+npx prisma migrate deploy     # applies the local migrations to DATABASE_URL
 ```
 
 Use `npx prisma migrate dev` only while developing a new migration. It can reset a development database when it finds drift.
@@ -237,7 +237,7 @@ The health check is `GET /`. Swagger UI documents every route, with request bodi
 | `npm run build` | Compile TypeScript into `dist/` |
 | `npm start` | Run the compiled server |
 | `npm run prisma:generate` | Generate the Prisma client |
-| `npx prisma migrate deploy` | Apply committed migrations to `DATABASE_URL` |
+| `npx prisma migrate deploy` | Apply local migrations to `DATABASE_URL` (migrations are git-ignored) |
 | `npm run prisma:seed` | Create roles, permissions, and default accounts |
 | `npx prisma studio` | Open Prisma Studio |
 | `npm run test:unit` | Run the Jest unit and HTTP tests (no database needed) |

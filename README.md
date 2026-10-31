@@ -38,7 +38,7 @@ Prerequisites: Node.js 20 or later, npm, and a PostgreSQL database.
 cd backend
 npm install
 npm run prisma:generate
-npx prisma migrate deploy
+npx prisma migrate dev --name init
 npm run prisma:seed
 npm run dev                  # http://localhost:5000
 
@@ -152,7 +152,7 @@ cd frontend && npx vue-tsc --noEmit && npx vite build
 
 ## Database
 
-- The schema is `backend/prisma/schema.prisma`. Migrations are committed in `backend/prisma/migrations/`, so a fresh clone can build the database with `npx prisma migrate deploy`.
+- The schema is `backend/prisma/schema.prisma`. Migrations are not tracked in git (`backend/prisma/migrations/` is ignored). A fresh database is built from the schema with `npx prisma migrate dev --name init`, which writes a local migration and applies it.
 - The seed (`npm run prisma:seed`) is safe to run more than once. It creates the roles, the permissions, and the default accounts listed in the backend README.
 - Use `prisma migrate dev` only while you are writing a new migration. It can reset a development database when it finds drift.
 

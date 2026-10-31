@@ -21,6 +21,7 @@ coverage/
 *.key
 
 # Prisma
+backend/prisma/migrations/
 prisma/*.db
 prisma/*.db-journal
 *.sqlite
