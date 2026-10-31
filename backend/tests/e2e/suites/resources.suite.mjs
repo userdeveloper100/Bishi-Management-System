@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { api } from "../helpers/api.mjs";
 
 // Full CRUD lifecycle for one resource: create, list, get, update, delete, confirm gone.
-function crudSuite(ctx, { name, path, create, update, deleteStatus = 200 }) {
+// listItems picks the array out of the list response, for resources that wrap it (groups).
+function crudSuite(ctx, { name, path, create, update, deleteStatus = 200, listItems = (body) => body }) {
     describe(name, () => {
         let id;
 
@@ -17,7 +18,7 @@ function crudSuite(ctx, { name, path, create, update, deleteStatus = 200 }) {
         it("lists, including the new record", async () => {
             const res = await api("GET", path, { token: ctx.admin.token });
             assert.equal(res.status, 200);
-            assert.ok(res.body.some((item) => item.id === id));
+            assert.ok(listItems(res.body).some((item) => item.id === id));
         });
 
         it("fetches by id", async () => {
@@ -73,6 +74,8 @@ export function resourcesSuite(ctx) {
             path: "/api/groups",
             create: () => ({ name: `E2E group ${Date.now()}` }),
             update: { name: `E2E group updated ${Date.now()}` },
+            // GET /api/groups returns { success, data: { summary, groups } }.
+            listItems: (body) => body.data.groups,
         });
 
         crudSuite(ctx, {

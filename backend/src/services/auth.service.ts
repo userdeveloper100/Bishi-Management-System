@@ -52,7 +52,8 @@ export const authService = {
             },
         });
 
-        if (!user) throw new Error("Invalid email or password");
+        // Phone-only accounts have no password, so they cannot log in with email.
+        if (!user || !user.password) throw new Error("Invalid email or password");
 
         const ok = await bcrypt.compare(password, user.password);
         if (!ok) throw new Error("Invalid email or password");
@@ -71,6 +72,47 @@ export const authService = {
                 name: user.name,
                 email: user.email,
                 role: roleName,
+            },
+        };
+    },
+
+    /**
+     * Log in (or register) a user after their phone number has been verified by OTP.
+     * New phone numbers get a "user" account with a placeholder name until a profile is set.
+     */
+    async loginWithPhone(phone: string) {
+        const existing = await prisma.user.findUnique({
+            where: { phone },
+            select: { id: true, name: true, phone: true, role: { select: { name: true } } },
+        });
+
+        let user = existing;
+        let isNewUser = false;
+
+        if (!user) {
+            const role = await prisma.role.findUnique({ where: { name: "user" } });
+            if (!role) throw new Error('Role "user" not found in database');
+
+            user = await prisma.user.create({
+                data: { name: "Member", phone, phoneVerified: true, roleId: role.id },
+                select: { id: true, name: true, phone: true, role: { select: { name: true } } },
+            });
+            isNewUser = true;
+        } else {
+            await prisma.user.update({ where: { id: user.id }, data: { phoneVerified: true } });
+        }
+
+        const roleName = user.role?.name || "user";
+        const token = this.generateToken({ id: user.id, role: roleName });
+
+        return {
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                phone: user.phone,
+                role: roleName,
+                isNewUser,
             },
         };
     },

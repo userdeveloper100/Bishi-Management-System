@@ -1,0 +1,19 @@
+/*
+ * Tailwind v4. Preflight is intentionally not imported: Ionic ships its own
+ * base styles, and a second reset would fight them.
+ */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@theme {
+  /* BhishiPay palette (fintech luxury) */
+  --color-pearl: #f8fafc;
+  --color-midnight: #0f172a;
+  --color-champagne: #c5a059;
+  --color-champagne-light: #e5c585;
+  /* Darker gold for text on light gold tints (WCAG contrast on white). */
+  --color-champagne-dark: #8a6a2f;
+  --color-mint: #10b981;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}

@@ -8,12 +8,17 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  name     String
-  email    String  @unique
-  password String
-  roleId   String?
-  role     Role?   @relation(fields: [roleId], references: [id])
+  id            String    @id @default(uuid())
+  name          String
+  email         String?   @unique
+  password      String?
+  phone         String?   @unique
+  phoneVerified Boolean   @default(false)
+  upiId         String?
+  language      String    @default("en")
+  proUntil      DateTime?
+  roleId        String?
+  role          Role?     @relation(fields: [roleId], references: [id])
 
   // ✅ Back-relations
   groups        Group[]        @relation("UserGroups")
@@ -57,12 +62,17 @@ model RolePermission {
 }
 
 model Group {
-  id      String    @id @default(uuid())
-  name    String
-  users   User[]    @relation("UserGroups")
-  bishis  Bishi[]
-  Message Message[]
-  membership Membership[]
+  id                  String    @id @default(uuid())
+  name                String
+  users               User[]    @relation("UserGroups")
+  bishis              Bishi[]
+  Message             Message[]
+  membership          Membership[]
+  cycleMonths         Int       @default(10)
+  monthlyContribution Float     @default(0)
+  status              String    @default("OPEN") // "BIDDING" | "OPEN" | "CLOSED"
+  nextBidRound        Int?
+  nextBidAt           DateTime?
 
   created_by    String?
   created_date  DateTime @default(now())
@@ -101,10 +111,14 @@ model Transaction {
 }
 
 model Notification {
-  id      String @id @default(uuid())
-  message String
-  userId  String
-  user    User   @relation(fields: [userId], references: [id])
+  id        String  @id @default(uuid())
+  message   String
+  title     String?
+  type      String? // "ROUND_OPEN" | "MEMBER_JOINED" | "WINNER_CONFIRMED" | "GROUP_CREATED"
+  groupName String?
+  read      Boolean @default(false)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
 
   created_by    String?
   created_date  DateTime @default(now())
@@ -124,6 +138,18 @@ model Message {
   created_date  DateTime @default(now())
   modified_by   String?
   modified_date DateTime @updatedAt
+}
+
+model OtpCode {
+  id         String    @id @default(uuid())
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, createdAt])
 }
 
 model AuditLog {

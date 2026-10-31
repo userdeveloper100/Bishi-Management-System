@@ -1,6 +1,6 @@
 // Stores the JWT for the signed-in user. localStorage is a placeholder for secure
 // device storage (for example Capacitor Preferences or Keychain) before release.
-const TOKEN_KEY = 'bishi.token';
+const TOKEN_KEY = 'bhishipay.token';
 
 export function getToken(): string | null {
   try {

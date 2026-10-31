@@ -1,0 +1,153 @@
+{
+  "common": {
+    "back": "Back",
+    "gotIt": "Got it",
+    "maybeLater": "Maybe later",
+    "cancel": "Cancel",
+    "loading": "Loading…"
+  },
+  "language": {
+    "name": "English",
+    "label": "Language preference",
+    "pickerTitle": "Choose language",
+    "pickerSubtitle": "The app updates straight away.",
+    "saveFailed": "Couldn't save your language. Try again."
+  },
+  "login": {
+    "title": "Welcome to BhishiPay",
+    "subtitle": "Enter your phone number to get started",
+    "label": "Mobile number",
+    "placeholder": "Your phone number",
+    "invalid": "Enter a valid 10-digit mobile number.",
+    "send": "Send OTP",
+    "sending": "Sending…",
+    "trust": "Private by design. Secure at every step.",
+    "stronger": "Stronger together",
+    "legalStart": "By continuing, you agree to our",
+    "terms": "Terms of Service",
+    "and": "and",
+    "privacy": "Privacy Policy",
+    "legalEnd": "."
+  },
+  "otp": {
+    "secure": "Secure verification",
+    "title": "Verify OTP",
+    "sentTo": "Enter the 6-digit code sent to",
+    "change": "Change number",
+    "notReceived": "Didn't receive the code?",
+    "resendIn": "Resend in {seconds}s",
+    "resend": "Resend OTP",
+    "verify": "Verify & continue",
+    "verifying": "Verifying…",
+    "private": "Your OTP is private. Never share it with anyone.",
+    "oneTimeCode": "One-time code",
+    "digitOf": "Digit {index} of {length}"
+  },
+  "tabs": {
+    "groups": "Groups",
+    "alerts": "Alerts",
+    "loan": "Loan/Ledger",
+    "profile": "Profile",
+    "nav": "Main navigation"
+  },
+  "header": {
+    "getPro": "Get Pro",
+    "notifications": "Notifications"
+  },
+  "groups": {
+    "welcome": "Welcome, {name}!",
+    "tagline": "Small circles. Greater possibilities.",
+    "yourGroups": "Your Groups",
+    "filter": "Filter groups",
+    "loading": "Loading your groups…",
+    "empty": "No groups yet. Start a circle to save together.",
+    "trustTitle": "A circle built on trust",
+    "trustBody": "Invite people you know. Grow together, one contribution at a time.",
+    "createAria": "Create a group",
+    "createTitle": "Create a group",
+    "createSubtitle": "Start a new savings circle",
+    "createBody": "Creating a group isn't available yet. Soon you'll name your circle, set the monthly contribution and choose the cycle length here.",
+    "addTitle": "Add members",
+    "addBody": "Inviting members by phone number isn't available yet. Once it is, you'll add people to {group} from here.",
+    "thisGroup": "this group"
+  },
+  "hero": {
+    "savings": "Your circle savings",
+    "contributions": "{count} contribution | {count} contributions",
+    "shared": "One shared ambition."
+  },
+  "card": {
+    "members": "{count} members · {months}-month circle",
+    "monthly": "Monthly contribution",
+    "nextBid": "Next bid · Round {round}",
+    "notScheduled": "Not scheduled",
+    "addMembers": "Add Members",
+    "moreOptions": "More options for {name}"
+  },
+  "status": {
+    "BIDDING": "BIDDING",
+    "OPEN": "OPEN",
+    "CLOSED": "CLOSED"
+  },
+  "bid": {
+    "today": "Today",
+    "tomorrow": "Tomorrow"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "newCount": "{count} new",
+    "subtitle": "All activities from your groups",
+    "loading": "Loading activity…",
+    "empty": "No activity in this category yet.",
+    "caughtUp": "You're all caught up",
+    "unread": "Unread",
+    "filterAria": "Filter alerts",
+    "all": "All",
+    "winners": "Winners",
+    "members": "Members",
+    "rounds": "Rounds",
+    "today": "TODAY",
+    "yesterday": "YESTERDAY"
+  },
+  "profile": {
+    "title": "Profile & Settings",
+    "loading": "Loading your profile…",
+    "accountTitle": "Account",
+    "settingsTitle": "Settings & Community",
+    "phone": "Phone",
+    "verified": "Verified",
+    "verify": "Verify",
+    "email": "Email",
+    "addEmail": "Add email",
+    "upi": "UPI ID",
+    "setUp": "Set up",
+    "joinAdmins": "Join BhishiPay Admins group",
+    "share": "Share BhishiPay",
+    "shareText": "Save together with BhishiPay.",
+    "logout": "Log out",
+    "editAria": "Edit profile",
+    "edit": "Edit",
+    "editTitle": "Edit profile",
+    "editSubtitle": "Your account details",
+    "editBody": "Editing these details isn't available yet.",
+    "name": "Name",
+    "notAdded": "Not added",
+    "notSet": "Not set up"
+  },
+  "pro": {
+    "title": "BhishiPay Pro",
+    "subtitle": "Unlimited circles and zero fees",
+    "banner": "Unlimited circles & zero fees · ₹299/3 months",
+    "benefit1": "Join and run more than one savings circle",
+    "benefit2": "No platform fees on contributions",
+    "benefit3": "Priority support for bidding and payouts",
+    "price": "₹299 for 3 months",
+    "notAvailable": "Purchasing Pro isn't available yet."
+  },
+  "loan": {
+    "title": "Loan / Ledger",
+    "subtitle": "Your contributions, payouts and loans in one place",
+    "soon": "Coming soon",
+    "body": "The ledger and loan details will appear here."
+  }
+}

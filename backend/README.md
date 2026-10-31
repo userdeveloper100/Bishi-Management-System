@@ -18,6 +18,9 @@ Out of scope for now (see [Not implemented yet](#not-implemented-yet)): payment 
 - Authentication middleware and role checks: `admin` role required for user-management routes and for deletes on other resources.
 - Seed script that creates the `admin` and `user` roles and their initial permissions.
 - Membership creation with `userId` and `groupId` validation.
+- Phone OTP sign-in: `POST /api/auth/send-otp` and `POST /api/auth/verify-otp`. Codes are 6 digits, stored only as hashes, valid for 5 minutes, and limited by attempt counts, a resend cooldown, and hourly send limits.
+- Read endpoints for the frontend: group summary (`GET /api/groups`), activity feed (`GET /api/alerts`), and profile with Pro status (`GET /api/user/profile`).
+- Unit tests for OTP, phone normalisation, group and alert mapping, and profile logic, using Jest and Supertest (`npm run test:unit`).
 - Token authentication on every resource route, with consistent `{ success, message }` error responses.
 - Input validation on create and update, with whitelisted update fields.
 - Hashed passwords for users created or updated through the API, and password hashes removed from user responses.
@@ -109,7 +112,12 @@ PORT=5000
 JWT_SECRET=replace-with-a-long-random-secret
 JWT_EXPIRES_IN=1d
 BCRYPT_SALT_ROUNDS=10
+SMS_PROVIDER=console
 ```
+
+`SMS_PROVIDER` selects how OTP messages are sent. It defaults to `console`, which does not deliver anything. In development the console sender logs the full message, including the code. When `NODE_ENV=production`, it logs only the masked phone number. A real SMS provider has not been added yet, so OTPs are not delivered to phones.
+
+For local testing, set `USE_LOCAL_OTP=true` (or run with `NODE_ENV=development`) to also accept the fixed code `560142`. It is always refused when `NODE_ENV=production`. See the [root README](../README.md#local-test-otp-development-only).
 
 `DATABASE_URL` must point to your PostgreSQL database. `PORT` defaults to `5000`, `JWT_EXPIRES_IN` defaults to `1d`, and `BCRYPT_SALT_ROUNDS` defaults to `10`. Do not commit `.env`; it is git-ignored.
 
@@ -149,15 +157,17 @@ All API routes use the `/api` prefix.
 
 | Resource | Base route | Available operations |
 | --- | --- | --- |
-| Authentication | `/api/auth` | `POST /register`, `POST /login` |
+| Authentication | `/api/auth` | `POST /register`, `POST /login`, `POST /send-otp`, `POST /verify-otp` |
 | Users | `/api/users` | `GET /`, `GET /:id`, `POST /`, `PUT /:id`, `DELETE /:id` |
-| Groups | `/api/groups` | CRUD |
+| Groups | `/api/groups` | CRUD; `GET /` with a token returns the caller's groups, or every group for admins, plus the savings summary |
 | Bishis | `/api/bishis` | CRUD |
 | Transactions | `/api/transactions` | CRUD |
 | Memberships | `/api/memberships` | CRUD |
 | Messages | `/api/messages` | CRUD |
 | Notifications | `/api/notifications` | CRUD |
 | Audit logs | `/api/audits` | CRUD |
+| Alerts | `/api/alerts` | `GET /?category=all\|winners\|members\|rounds` (the caller's activity feed, with category counts) |
+| Profile | `/api/user/profile` | `GET /` (the caller's details, verification status, and Pro status) |
 
 CRUD routes provide `GET /`, `GET /:id`, `POST /`, `PUT /:id`, and `DELETE /:id` under the resource's base route. Interactive API documentation is available at `http://localhost:5000/api-docs`. The health check is available at `GET /`.
 
@@ -184,9 +194,20 @@ Errors return `{ "success": false, "message": "..." }`. Validation failures retu
 | `npm run prisma:migrate` | Run Prisma migrations |
 | `npx prisma studio` | Open Prisma Studio |
 | `npx ts-node prisma/seed.ts` | Create initial roles and permissions |
-| `npm run test:e2e` | Run the end-to-end API test suite |
+| `npm run test:unit` | Run the Jest unit and HTTP tests (no database needed) |
+| `npm run test:e2e` | Run the end-to-end API test suite (uses the database in `.env`) |
 
 ## Testing
+
+### Unit and HTTP tests
+
+```bash
+npm run test:unit
+```
+
+These use Jest, ts-jest, and Supertest. They mock Prisma and the SMS sender, so they need no database. They cover OTP generation, storage, and verification; phone normalisation; group and alert mapping; the profile; and the HTTP routes.
+
+### End-to-end tests
 
 The end-to-end suite lives in `tests/e2e/`, separate from the application source. It uses Node's built-in test runner, so it needs no extra dependencies.
 

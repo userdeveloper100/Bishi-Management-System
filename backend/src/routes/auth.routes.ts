@@ -103,4 +103,76 @@ router.post("/register", authController.register);
  */
 router.post("/login", authController.login);
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     SendOtpInput:
+ *       type: object
+ *       required:
+ *         - phone
+ *       properties:
+ *         phone:
+ *           type: string
+ *           example: "+919876543210"
+ *     VerifyOtpInput:
+ *       type: object
+ *       required:
+ *         - phone
+ *         - otp
+ *       properties:
+ *         phone:
+ *           type: string
+ *           example: "+919876543210"
+ *         otp:
+ *           type: string
+ *           example: "482616"
+ */
+
+/**
+ * @swagger
+ * /auth/send-otp:
+ *   post:
+ *     summary: Send a one-time code by SMS to an Indian mobile number
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/SendOtpInput'
+ *     responses:
+ *       200:
+ *         description: OTP sent
+ *       400:
+ *         description: Invalid phone number
+ *       429:
+ *         description: Resend requested too soon, or too many requests this hour
+ */
+router.post("/send-otp", authController.sendOtp);
+
+/**
+ * @swagger
+ * /auth/verify-otp:
+ *   post:
+ *     summary: Verify an OTP and sign in (creates the account on first use)
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/VerifyOtpInput'
+ *     responses:
+ *       200:
+ *         description: Signed in
+ *       400:
+ *         description: Invalid phone number or OTP format
+ *       401:
+ *         description: Invalid OTP, or the OTP expired or was not found
+ *       429:
+ *         description: Too many incorrect attempts
+ */
+router.post("/verify-otp", authController.verifyOtp);
+
 export default router;

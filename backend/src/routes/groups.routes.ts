@@ -45,17 +45,58 @@ const router = Router();
  * @swagger
  * /groups:
  *   get:
- *     summary: Get all groups
+ *     summary: Get the caller's groups with contribution totals (admins see all groups)
  *     tags: [Groups]
  *     responses:
  *       200:
- *         description: List of groups
+ *         description: Groups and contribution summary
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Group'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     summary:
+ *                       type: object
+ *                       properties:
+ *                         totalSavings:
+ *                           type: number
+ *                         contributionsCount:
+ *                           type: integer
+ *                     groups:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           memberCount:
+ *                             type: integer
+ *                           cycleMonths:
+ *                             type: integer
+ *                           monthlyContribution:
+ *                             type: number
+ *                           status:
+ *                             type: string
+ *                             enum: [BIDDING, OPEN, CLOSED]
+ *                           nextBid:
+ *                             type: object
+ *                             nullable: true
+ *                             properties:
+ *                               round:
+ *                                 type: integer
+ *                               at:
+ *                                 type: string
+ *                                 format: date-time
+ *                           role:
+ *                             type: string
+ *                             enum: [owner, member]
  */
 router.get("/", groupController.getAll);
 

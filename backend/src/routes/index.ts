@@ -9,6 +9,8 @@ import membershipRoutes from "./memberships.routes";
 import notificationRoutes from "./notifications.routes";
 import auditRoutes from "./audits.routes";
 import authRoutes from "./auth.routes";
+import alertRoutes from "./alerts.routes";
+import profileRoutes from "./profile.routes";
 import { AuthRequest, authMiddleware, authorizeRoles } from "../middlewares/auth";
 import { NextFunction, Response } from "express";
 
@@ -29,5 +31,9 @@ router.use("/memberships", authMiddleware, adminForDelete, membershipRoutes);
 router.use("/notifications", authMiddleware, adminForDelete, notificationRoutes);
 router.use("/audits", authMiddleware, adminForDelete, auditRoutes);
 router.use("/auth", authRoutes);
+
+// Signed-in user's own data. No admin rule: each handler only reads the caller's records.
+router.use("/alerts", authMiddleware, alertRoutes);
+router.use("/user", authMiddleware, profileRoutes);
 
 export default router;

@@ -1,2 +1,26 @@
-/* For information on how to create your own theme, please refer to:
-http://ionicframework.com/docs/theming/ */
+/* Ionic theme variables mapped to the BhishiPay palette.
+   Reference: https://ionicframework.com/docs/theming/basics */
+
+:root {
+  color-scheme: light;
+
+  --ion-font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ion-background-color: #f8fafc;
+  --ion-text-color: #0f172a;
+
+  --ion-color-primary: #0f172a;
+  --ion-color-primary-rgb: 15, 23, 42;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #0d1528;
+  --ion-color-primary-tint: #26324a;
+
+  --ion-color-success: #10b981;
+  --ion-color-success-rgb: 16, 185, 129;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+}
+
+ion-app {
+  background: #f8fafc;
+}
