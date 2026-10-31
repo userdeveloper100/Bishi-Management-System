@@ -18,6 +18,21 @@ export const RESEND_COOLDOWN_SECONDS = 30;
 export const MAX_SENDS_PER_HOUR = 5;
 export const MAX_VERIFY_ATTEMPTS = 5;
 
+/**
+ * How many codes one phone number may be sent in the rolling hour, or null for no cap.
+ * Production always uses MAX_SENDS_PER_HOUR. Elsewhere OTP_MAX_SENDS_PER_HOUR overrides it,
+ * and development has no cap, so local testing is not blocked.
+ */
+export function sendsPerHourLimit(): number | null {
+  const env = (process.env.NODE_ENV ?? "").trim().toLowerCase();
+  if (env === "production") return MAX_SENDS_PER_HOUR;
+
+  const override = Number(process.env.OTP_MAX_SENDS_PER_HOUR);
+  if (Number.isInteger(override) && override > 0) return override;
+
+  return env === "development" ? null : MAX_SENDS_PER_HOUR;
+}
+
 function hashSecret(): string {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error("JWT_SECRET is not set");
@@ -59,12 +74,15 @@ export const otpService = {
       );
     }
 
-    const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-    const sentRecently = await prisma.otpCode.count({
-      where: { phone, createdAt: { gte: hourAgo } },
-    });
-    if (sentRecently >= MAX_SENDS_PER_HOUR) {
-      throw new HttpError(429, "Too many OTP requests. Try again later.");
+    const limit = sendsPerHourLimit();
+    if (limit !== null) {
+      const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+      const sentRecently = await prisma.otpCode.count({
+        where: { phone, createdAt: { gte: hourAgo } },
+      });
+      if (sentRecently >= limit) {
+        throw new HttpError(429, "Too many OTP requests. Try again later.");
+      }
     }
 
     const code = generateOtp();

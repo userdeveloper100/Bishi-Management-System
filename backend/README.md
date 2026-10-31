@@ -6,7 +6,7 @@ The frontend is in [../frontend](../frontend/README.md). The monorepo overview i
 
 ## What the API covers
 
-- **Phone sign-in (OTP):** send a 6-digit code by SMS and verify it for a JWT. Codes are stored only as hashes, expire after 5 minutes, and are limited by attempt counts, a 30-second resend cooldown, and five sends per hour.
+- **Phone sign-in (OTP):** send a 6-digit code by SMS and verify it for a JWT. Codes are stored only as hashes, expire after 5 minutes, and are limited by attempt counts, a 30-second resend cooldown, and five sends per hour per phone number. The hourly cap is removed in development and can be changed with `OTP_MAX_SENDS_PER_HOUR` (see [Environment variables](#2-configure-environment-variables)). Production always uses five.
 - **Local test login:** in development, a fixed code (`560142`) signs in any account in the database, with no SMS. It is always refused in production.
 - **Email and password login:** for the seeded admin accounts and any accounts created through `POST /api/auth/register`, which also requires a phone number.
 - **Role tiers:** Super Admin, group Admin, and Member (see [Roles](#roles)).
@@ -163,6 +163,7 @@ USE_LOCAL_OTP=true
 | `SMS_PROVIDER` | `console` | `console` logs OTPs instead of sending them. No other provider exists yet. |
 | `NODE_ENV` | unset | `development` enables the local test login. `production` disables it and hides OTPs in SMS logs. |
 | `USE_LOCAL_OTP` | `false` | `true` enables the local test login even when `NODE_ENV` is not `development`. Ignored in production. |
+| `OTP_MAX_SENDS_PER_HOUR` | `5` (no cap in development) | Codes one phone number may be sent in the rolling hour. Set it for local testing, for example `50`. Ignored in production. |
 
 Never set `NODE_ENV=development` or `USE_LOCAL_OTP=true` on a server that serves real users.
 
@@ -287,6 +288,7 @@ Jest with ts-jest and Supertest. Prisma and the SMS sender are mocked (`tests/he
 | Test file | Covers |
 | --- | --- |
 | `unit/otp.service.test.ts`, `unit/otp.util.test.ts` | OTP generation, hashing, expiry, attempts, cooldown, hourly cap, local test login, production guard |
+| `unit/otp.limit.test.ts` | The hourly send cap by environment: production, development with no cap, and the `OTP_MAX_SENDS_PER_HOUR` override |
 | `unit/phone.test.ts`, `unit/auth.phone.test.ts` | Phone normalisation and the local test numbers |
 | `unit/seedUsers.test.ts` | Default phone users and their local-only sign-in |
 | `unit/contribution.service.test.ts` | Dues generation, marking paid, audit entry, 403, 404, 409, Super Admin rights |
