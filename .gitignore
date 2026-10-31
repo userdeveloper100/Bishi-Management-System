@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.vite/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+*.pem
+*.key
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+*.sqlite
+*.sqlite-journal
+
+# Logs and caches
+*.log
+.cache/
+.eslintcache
+.playwright/
+test-results/
+playwright-report/
+
+# Local agent/IDE settings (keep shared config, ignore personal overrides)
+.claude/settings.local.json
+.claude.json
+.claude.json.backup
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
