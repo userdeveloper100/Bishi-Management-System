@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  password String
+  roleId   String?
+  role     Role?   @relation(fields: [roleId], references: [id])
+
+  // ✅ Back-relations
+  groups        Group[]        @relation("UserGroups")
+  ownedBishis   Bishi[]        @relation("UserOwnedBishis")
+  transactions  Transaction[]
+  notifications Notification[]
+  messages      Message[]
+  membership    Membership[]
+
+  created_by    String?
+  created_date  DateTime @default(now())
+  modified_by   String?
+  modified_date DateTime @updatedAt
+}
+
+model Role {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  users       User[]
+  permissions RolePermission[]
+
+  description String?
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  description String?
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  id           String @id @default(uuid())
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId]) // prevent duplicates
+}
+
+model Group {
+  id      String    @id @default(uuid())
+  name    String
+  users   User[]    @relation("UserGroups")
+  bishis  Bishi[]
+  Message Message[]
+  membership Membership[]
+
+  created_by    String?
+  created_date  DateTime @default(now())
+  modified_by   String?
+  modified_date DateTime @updatedAt
+}
+
+model Bishi {
+  id           String        @id @default(uuid())
+  title        String
+  description  String?
+  groupId      String
+  group        Group         @relation(fields: [groupId], references: [id])
+  ownerId      String
+  owner        User          @relation("UserOwnedBishis", fields: [ownerId], references: [id])
+  transactions Transaction[]
+
+  created_by    String?
+  created_date  DateTime @default(now())
+  modified_by   String?
+  modified_date DateTime @updatedAt
+}
+
+model Transaction {
+  id      String @id @default(uuid())
+  amount  Float
+  bishiId String
+  bishi   Bishi  @relation(fields: [bishiId], references: [id])
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+
+  created_by    String?
+  created_date  DateTime @default(now())
+  modified_by   String?
+  modified_date DateTime @updatedAt
+}
+
+model Notification {
+  id      String @id @default(uuid())
+  message String
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+
+  created_by    String?
+  created_date  DateTime @default(now())
+  modified_by   String?
+  modified_date DateTime @updatedAt
+}
+
+model Message {
+  id      String @id @default(uuid())
+  content String
+  groupId String
+  group   Group  @relation(fields: [groupId], references: [id])
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+
+  created_by    String?
+  created_date  DateTime @default(now())
+  modified_by   String?
+  modified_date DateTime @updatedAt
+}
+
+model AuditLog {
+  id          String @id @default(uuid())
+  action      String
+  entity      String
+  entityId    String
+  performedBy String
+
+  created_by    String?
+  created_date  DateTime @default(now())
+  modified_by   String?
+  modified_date DateTime @updatedAt
+}
+
+model Membership {
+  id            String   @id @default(uuid())
+  userId        String
+  groupId       String
+
+  user          User     @relation(fields: [userId], references: [id])
+  group         Group    @relation(fields: [groupId], references: [id])
+
+  role          String?  // e.g., "member", "admin" if you want roles
+  status        String?  // e.g., "pending", "accepted"
+
+  created_by    String?
+  created_date  DateTime @default(now())
+  modified_by   String?
+  modified_date DateTime @updatedAt
+}
